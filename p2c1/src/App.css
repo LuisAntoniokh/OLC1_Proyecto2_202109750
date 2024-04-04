@@ -1,0 +1,43 @@
+.App {
+  background-color: #004d4d; 
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+}
+
+.label {
+  font-weight: bold;
+}
+
+.textarea {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.dropdown-menu {
+  background-color: #004d4d; 
+}
+
+.btn-secondary {
+  background-color: #4af78c; 
+  border-color: #4af78c; 
+}
+
+.btn-secondary:hover {
+  background-color: #3eb576;
+  border-color: #3eb576; 
+}
+
+.dropdown-item {
+  color: #fff;
+}
+
+.dropdown-item:hover {
+  background-color: #009999; 
+}
