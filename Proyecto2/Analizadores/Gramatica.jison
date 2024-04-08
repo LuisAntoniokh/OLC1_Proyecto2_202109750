@@ -17,73 +17,9 @@
 
 %%
 
-\s+     
-
-/*"INT"                   return 'INT';
-"DOUBLE"                return 'DOUBLE';
-"BOOL"                  return 'BOOL';
-"CHAR"                  return 'CHAR';
-"STRING"                return 'STRING';
-"EXECUTE"               return 'EXEC';
-"POW"                   return 'EXPONENTE';
-"NEW"                   return 'NUEVO';
-"TRUE"                  return 'VERDADERO';
-"FALSE"                 return "FALSO";
-"IF"                    return 'SI';
-"ELSE"                  return 'DEMAS';
-"SWITCH"                return 'TLOZ';
-"CASE"                  return 'CASO';
-"DEFAULT"               return 'DEFECTO';
-"BREAK"                 return 'ROMPER';
-"WHILE"                 return 'MIENTRAS';
-"FOR"                   return 'PARA';
-"DO"                    return 'HACER';
-"CONTINUE"              return 'CONTINUAR';
-"RETURN"                return 'RETORNAR';
-"COUT"                  return 'SALIDA';
-"ENDL"                  return 'ACABARL';
-"TOLOWER"               return 'AMINUS';
-"TOUPPER"               return 'AMAYUS';
-"ROUND"                 return 'REDONDEAR';
-"LENGTH"                return 'LARGO';
-"TYPEOF"                return 'TIPODE';
-"STD"                   return 'STD';
-"toString"              return 'aString';
-"C_STR"                 return 'car_STR';
-
-[0-9]+("."[0-9]+)\b     return 'DECIMAL';
-[0-9]+\b                return 'NUMBER';
-[a-zA-Z][a-zA-Z0-9_]*   return 'ID';
-
-"+"                     return 'MAS';
-"-"                     return 'RES';
-"*"                     return 'MUL';
-"/"                     return 'DIV';
-";"                     return 'PYC';
-":"                     return 'DPS';
-","                     return 'COMA';
-"."                     return 'PUNTO';
-"["                     return 'CORIZQ';
-"]"                     return 'CORDER';
-"("                     return 'PARIZQ';
-")"                     return 'PARDER';
-"{"                     return 'LLAVEIZQ';
-"}"                     return 'LLAVEDER';
-"=="                    return 'IGUALACION';
-"!="                    return 'DISTINCION';
-"<="                    return 'MENOSIGUALQUE';
-">="                    return 'MASIGUALQUE';
-"||"                    return 'OR';
-"&&"                    return 'AND';
-"!"                     return 'NOT';
-"?"                     return 'QMARK';
-"<"                     return 'MENOSQUE';
-">"                     return 'MASQUE';
-"="                     return 'IGUAL';
-"%"                     return 'MODUL';
-
-\"[^\"]*\"				{ yytext = yytext.substr(1,yyleng-2); return 'CADENA'; }
-*/
+\s+                                 //ignora espacios
+//Palabras reservadas
+// Comentarios son con //
 
 [0-9]+("."[0-9]+)\b     return 'DOUBLE';
 [0-9]+\b                return 'NUMBER';

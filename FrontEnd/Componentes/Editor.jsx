@@ -12,7 +12,7 @@ export function EditorT() {
   }
 
   function showValue() {
-    POST("http://localhost:5173/interpretar",editorRef.current.getValue()).then(res=>
+    POST("http://localhost:3000/interpretar",editorRef.current.getValue()).then(res=>
     {
         console.log(res.resultado)
         setResultado(res.resultado)
