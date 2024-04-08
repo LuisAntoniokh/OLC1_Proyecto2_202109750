@@ -14,7 +14,7 @@ export enum TipoDato{
 }
 
 export enum OpAritmetica{
-    SUMA, RESTA, PRODUCTO,DIVISION
+    SUMA, RESTA, PRODUCTO, DIVISION, MODULO, POTENCIA
 }
 
 export enum OpRelacional{

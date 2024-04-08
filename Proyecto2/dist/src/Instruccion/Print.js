@@ -1,17 +1,26 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Bloque = void 0;
+exports.Print = void 0;
+const Resultado_1 = require("../Expresion/Resultado");
 const Instruccion_1 = require("./Instruccion");
-class Bloque extends Instruccion_1.Instruccion {
-    constructor(instrucciones) {
-        super(0, 0);
-        this.instrucciones = instrucciones;
+class Print extends Instruccion_1.Instruccion {
+    constructor(expresion, salto, linea, columna) {
+        super(linea, columna);
+        this.expresion = expresion;
+        this.salto = salto;
     }
     interpretar(consola) {
-        this.instrucciones.forEach(instruccion => {
-            instruccion.interpretar(consola);
-        });
+        const res = this.expresion.interpretar();
+        if (res.tipo == Resultado_1.TipoDato.BOOLEANO) {
+            res.valor = res.valor ? "true" : "false";
+        }
+        if (this.salto) {
+            consola.push(res.valor + "\n");
+        }
+        else {
+            consola.push(res.valor + "");
+        }
         return null;
     }
 }
-exports.Bloque = Bloque;
+exports.Print = Print;

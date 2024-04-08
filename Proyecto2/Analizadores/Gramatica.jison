@@ -24,28 +24,70 @@
 [0-9]+("."[0-9]+)\b     return 'DOUBLE';
 [0-9]+\b                return 'NUMBER';
 
-"EXEC"                  return 'EXEC';
-"print"                 return 'PRINT';
-"println"               return 'PRINTLN';
+// Tipo de datos
+"INT"                   return 'INT';
+"DOUBLE"                return 'DOUBLE';
+"BOOL"                  return 'BOOL';
+"CHAR"                  return 'CHAR';
+"STRING"                return 'STRING';
+
+// Funciones para imprimir o ejecutar
+"EXECUTE"               return 'EXEC';
+"COUT"                  return 'COUT';
+"ENDL"                  return 'ENDL';
+"<<"                    return 'CPR';
 "true"                  return 'TRUE';
 "false"                 return 'FALSE';
+
 //Instrucciones de control
 "if"                    return 'IF';
 "else"                  return 'ELSE';
 "{"                     return 'LLAVEIZQ';
 "}"                     return 'LLAVEDER';
+"SWITCH"                return 'SWITCH';
+"CASE"                  return 'CASE';
+"BREAK"                 return 'BREAK';
+"DEFAULT"               return 'DEFAULT';
 
-([a-zA-z])[a-zA-Z0-9_]* return 'ID';
+// Ciclos
+"WHILE"                 return 'WHILE';
+"FOR"                   return 'FOR';
+"DO"                    return 'DO';
+
+// Otras funciones
+"TOLOWER"               return 'TOLOWER';
+"TOUPPER"               return 'TOUPPER';
+"ROUND"                 return 'ROUND';
+
+//Funciones nativas
+"LENGTH"                return 'LENGTH';
+"TYPEOF"                return 'TYPEOF';
+"TOSTRING"              return 'TOSTRING';
+"C_STR"                 return 'C_STR';
+
+// Demas palabras reservadas
+"NEW"                   return 'NUEVO';
+"RETURN"                return 'RETURN';
+"CONTINUE"              return 'CONTINUE';
+"STD"                   return 'STD';
 
 // signos
 "("                     return 'PARIZQ';
 ")"                     return 'PARDER';
+"["                     return 'CIZQ';
+"]"                     return 'CDER';
+","                     return 'COMA';
+"."                     return 'PUNTO';
+
 // Aritmeticas
 "+"                     return 'MAS';
 "-"                     return 'RES';
 "*"                     return 'MUL';
 "/"                     return 'DIV';
+"POW"                   return 'POW';
+"%"                     return 'MOD';
 ";"                     return 'PYC';
+
 // Relacionales
 "=="                    return 'IGUAL';
 "!="                    return 'DISTINTO';
@@ -54,10 +96,18 @@
 ">="                    return 'MAYORIGUAL';
 ">"                     return 'MAYOR';
 "="                     return 'ASIGNACION';
-//logicos
+
+// Logicos
 "&&"                    return 'AND';
 "||"                    return 'OR';
 "!"                     return 'NOT';
+
+// Ternario
+'?'                     return 'QMARK';
+':'                     return 'DPS';
+
+([a-zA-z])[a-zA-Z0-9_]* return 'ID';
+
 // Cadenas             "asdfasdfasf"
 \"[^\"]*\"				{ yytext = yytext.substr(1,yyleng-2); return 'CADENA'; }
 
@@ -74,7 +124,8 @@
 %left 'AND'
 %left 'IGUAL','DISTINTO','MENOR','MENORIGUAL','MAYOR','MAYORIGUAL'
 %left 'MAS', 'RES'
-%left 'MUL','DIV'
+%left 'MUL','DIV', 'MOD'
+%left 'POW'
 %right UMINUS 
 
 // Inicio de gramática
@@ -92,14 +143,18 @@ instrucciones: instrucciones instruccion    {  $1.push($2); $$ = $1;}
 
 instruccion: EXEC expresion PYC         { $$ =  $2;}
             | fn_print PYC               { $$ = $1;}
+            | Declartion PYC              { $$ = $1;}
             | fn_if                     { $$ = $1;}
 ;
+
 // Para sitetisar un dato, se utiliza $$
 expresion: RES expresion %prec UMINUS   { $$ = new Aritmetica(new Primitivo(0,0,0),$2,OpAritmetica.RESTA,0,0);} 
         | expresion MAS expresion      { $$ = new Aritmetica($1,$3,OpAritmetica.SUMA,0,0);}
         | expresion RES expresion       { $$ = new Aritmetica($1,$3,OpAritmetica.RESTA,0,0);}
         | expresion MUL expresion       { $$ =  new Aritmetica($1,$3,OpAritmetica.PRODUCTO,0,0);}
         | expresion DIV expresion       { $$ =  new Aritmetica($1,$3,OpAritmetica.DIVISION,0,0);}
+        | expresion MOD expresion       { $$ =  new Aritmetica($1,$3,OpAritmetica.MODULO,0,0);}
+        | POW PARIZQ expresion COMA expresion PARDER    { $$ =  new Aritmetica($3,$5,OpAritmetica.POTENCIA,0,0);}
         | relacionales                   { $$ = $1;}
         | logicos                   { $$ = $1;}
         | NUMBER                        { $$ = new Primitivo($1,TipoDato.NUMBER,0,0); }
@@ -125,8 +180,8 @@ logicos
         | NOT expresion                 { $$ =  new Logico(null,$2,OpLogico.NOT,0,0);}
 ;
 
-fn_print: PRINT PARIZQ expresion PARDER { $$ = new Print($3,false,0,0)}
-        | PRINTLN PARIZQ expresion PARDER { $$ = new Print($3,true,0,0)}
+fn_print: COUT CPR expresion { $$ = new Print($3); }
+        | COUT CPR expresion CPR ENDL { $$ = new Print($3,true,0,0)}
 ;
 // Bloque de instrucciones
 bloque

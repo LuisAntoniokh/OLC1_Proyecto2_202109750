@@ -2,7 +2,8 @@
 .					   {    console.log(yylloc.first_line, yylloc.first_column,'Lexico',yytext);    }
 
 
-
+ | POW PARIZQ expresion COMA expresion PARDER    { $$ =  new Aritmetica($2,$4,OpAritmetica.POTENCIA,0,0);}
+ 
 /*"INT"                   return 'INT';
 "DOUBLE"                return 'DOUBLE';
 "BOOL"                  return 'BOOL';
