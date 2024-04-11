@@ -9,5 +9,8 @@ class Simbolo {
         this.fila = fila;
         this.columna = columna;
     }
+    interpretar(consola) {
+        //consola.push(this.valor + "\n");
+    }
 }
 exports.Simbolo = Simbolo;

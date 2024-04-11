@@ -12,4 +12,9 @@ export class Simbolo {
         this.fila = fila;
         this.columna = columna;
     }
+
+    interpretar(consola: string[]): void {
+        
+        //consola.push(this.valor + "\n");
+    }
 }

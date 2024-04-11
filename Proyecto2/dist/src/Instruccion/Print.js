@@ -18,7 +18,7 @@ class Print extends Instruccion_1.Instruccion {
             consola.push(res.valor + "\n");
         }
         else {
-            consola.push(res.valor + "");
+            consola.push(res.valor);
         }
         return null;
     }

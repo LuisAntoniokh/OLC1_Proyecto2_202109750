@@ -169,19 +169,18 @@ expresion: RES expresion %prec UMINUS   { $$ = new Aritmetica(new Primitivo(0,0,
         | ID {
     let simbolo = tablaSimbolos.obtener($1);
     if (simbolo) {
-        console.log(simbolo.valor);
-        $$ = simbolo.valor; // Devuelve el valor del símbolo
+        $$ = new Primitivo(simbolo.valor, simbolo.tipo, @1.first_line, @1.first_column);
     } else {
         console.error(`Error: Variable ${$1} no definida.`);
-        $$ = null; // Devuelve null si el símbolo no existe
+        $$ = new Primitivo(null, TipoDato.NULO, @1.first_line, @1.first_column);
     }
 }
 ;
 
 declaracion: INT ID ASIGNACION NUMBER 
     { 
-        $$ = new Simbolo($2, 'int', $4, @2.first_line, @2.first_column);
-        tablaSimbolos.guardar($2, 'int', $4, @2.first_line, @2.first_column);
+        $$ = new Simbolo($2, TipoDato.NUMBER, $4, @2.first_line, @2.first_column);
+        tablaSimbolos.guardar($2, TipoDato.NUMBER, $4, @2.first_line, @2.first_column);
     }
 | DOUBLE ID ASIGNACION DOUBLE 
     { 

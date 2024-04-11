@@ -25,6 +25,7 @@ export class Primitivo extends Expresion{
         }
 
         // en caso que no sea ninguno
+        console.log("Error en la interpretación del primitivo")
         return {valor:null,tipo:TipoDato.NULO}
     }
 }

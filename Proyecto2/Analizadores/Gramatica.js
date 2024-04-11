@@ -138,18 +138,17 @@ case 23:
 
     let simbolo = tablaSimbolos.obtener($$[$0]);
     if (simbolo) {
-        console.log(simbolo.valor);
-        this.$ = simbolo.valor; // Devuelve el valor del símbolo
+        this.$ = new Primitivo(simbolo.valor, simbolo.tipo, _$[$0].first_line, _$[$0].first_column);
     } else {
         console.error(`Error: Variable ${$$[$0]} no definida.`);
-        this.$ = null; // Devuelve null si el símbolo no existe
+        this.$ = new Primitivo(null, TipoDato.NULO, _$[$0].first_line, _$[$0].first_column);
     }
 
 break;
 case 24:
  
-        this.$ = new Simbolo($$[$0-2], 'int', $$[$0], _$[$0-2].first_line, _$[$0-2].first_column);
-        tablaSimbolos.guardar($$[$0-2], 'int', $$[$0], _$[$0-2].first_line, _$[$0-2].first_column);
+        this.$ = new Simbolo($$[$0-2], TipoDato.NUMBER, $$[$0], _$[$0-2].first_line, _$[$0-2].first_column);
+        tablaSimbolos.guardar($$[$0-2], TipoDato.NUMBER, $$[$0], _$[$0-2].first_line, _$[$0-2].first_column);
     
 break;
 case 25:

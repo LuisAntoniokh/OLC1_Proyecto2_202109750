@@ -26,6 +26,7 @@ class Primitivo extends Expresion_1.Expresion {
             return { valor: this.exp1.toString(), tipo: this.tipo };
         }
         // en caso que no sea ninguno
+        console.log("Error en la interpretación del primitivo");
         return { valor: null, tipo: Resultado_1.TipoDato.NULO };
     }
 }

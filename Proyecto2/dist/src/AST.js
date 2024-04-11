@@ -10,17 +10,22 @@ class AST {
         // Primera pasada
         this.instrucciones.forEach(instruccion => {
             if (typeof instruccion.interpretar === 'function') {
-                instruccion.interpretar(this.consola);
+                let resultado = instruccion.interpretar(this.consola);
+                if (resultado !== null && resultado !== undefined) {
+                    this.consola.push(resultado);
+                }
             }
             else {
-                console.error('Error: instruccion no tiene un método interpretar.');
+                console.error(`Error: La instrucción de tipo ${instruccion.constructor.name} no tiene un método interpretar.`);
             }
         });
     }
     getConsola() {
         let salid = "";
         for (let index = 0; index < this.consola.length; index++) {
-            salid += this.consola[index].toString();
+            if (this.consola[index] !== null) {
+                salid += this.consola[index].toString();
+            }
         }
         return salid;
     }
