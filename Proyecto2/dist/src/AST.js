@@ -9,16 +9,19 @@ class AST {
     Ejecutar() {
         // Primera pasada
         this.instrucciones.forEach(instruccion => {
-            instruccion.interpretar(this.consola);
+            if (typeof instruccion.interpretar === 'function') {
+                instruccion.interpretar(this.consola);
+            }
+            else {
+                console.error('Error: instruccion no tiene un método interpretar.');
+            }
         });
     }
     getConsola() {
-        console.log(this.consola);
         let salid = "";
         for (let index = 0; index < this.consola.length; index++) {
             salid += this.consola[index].toString();
         }
-        console.log(salid);
         return salid;
     }
 }

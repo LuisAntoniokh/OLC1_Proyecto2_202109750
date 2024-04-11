@@ -9,6 +9,9 @@
     const {Bloque} = require("../dist/src/Instruccion/Bloque");
     const {FN_IF} = require("../dist/src/Instruccion/Control/IF");
     const {AST} = require("../dist/src/AST");
+    const {Simbolo} = require("../dist/src/TablaSimbolos/Simbolo");
+    const {TablaSimbolos} = require("../dist/src/TablaSimbolos/Tablita");
+    let tablaSimbolos = new TablaSimbolos();
 %}
 
 %lex // Inicia parte léxica
@@ -110,7 +113,7 @@
 
 // Cadenas             "asdfasdfasf"
 \"[^\"]*\"				{ yytext = yytext.substr(1,yyleng-2); return 'CADENA'; }
-
+\'[a-zA-Z0-9]\'				{ yytext = yytext.substr(1,yyleng-2); return 'CARACTER'; }
 <<EOF>>                 return 'EOF';
 
 .					   {    console.log(yylloc.first_line, yylloc.first_column,'Lexico',yytext);    }
@@ -134,7 +137,7 @@
 // Parte sintáctica  - Definición de la gramática
 %%
 
-ini : instrucciones EOF { return new AST($1);}
+ini : instrucciones EOF { tablaSimbolos.imprimir(); return new AST($1);}
 ;
 
 instrucciones: instrucciones instruccion    {  $1.push($2); $$ = $1;}
@@ -143,7 +146,7 @@ instrucciones: instrucciones instruccion    {  $1.push($2); $$ = $1;}
 
 instruccion: EXEC expresion PYC         { $$ =  $2;}
             | fn_print PYC               { $$ = $1;}
-            | Declartion PYC              { $$ = $1;}
+            | declaracion PYC              { $$ = $1;}
             | fn_if                     { $$ = $1;}
 ;
 
@@ -163,6 +166,48 @@ expresion: RES expresion %prec UMINUS   { $$ = new Aritmetica(new Primitivo(0,0,
         | FALSE                        { $$ =  new Primitivo($1,TipoDato.BOOLEANO,0,0); }
         | CADENA                        { $$ =  new Primitivo($1,TipoDato.STRING,0,0); }
         | PARIZQ expresion PARDER        { $$ = $2;}
+        | ID {
+    let simbolo = tablaSimbolos.obtener($1);
+    if (simbolo) {
+        console.log(simbolo.valor);
+        $$ = simbolo.valor; // Devuelve el valor del símbolo
+    } else {
+        console.error(`Error: Variable ${$1} no definida.`);
+        $$ = null; // Devuelve null si el símbolo no existe
+    }
+}
+;
+
+declaracion: INT ID ASIGNACION NUMBER 
+    { 
+        $$ = new Simbolo($2, 'int', $4, @2.first_line, @2.first_column);
+        tablaSimbolos.guardar($2, 'int', $4, @2.first_line, @2.first_column);
+    }
+| DOUBLE ID ASIGNACION DOUBLE 
+    { 
+        $$ = new Simbolo($2, 'double', $4, @2.first_line, @2.first_column);
+        tablaSimbolos.guardar($2, 'double', $4, @2.first_line, @2.first_column);
+    }
+| BOOL ID ASIGNACION TRUE 
+    { 
+        $$ = new Simbolo($2, 'bool', $4, @2.first_line, @2.first_column);
+        tablaSimbolos.guardar($2, 'bool', $4, @2.first_line, @2.first_column);
+    }
+| BOOL ID ASIGNACION FALSE 
+    { 
+        $$ = new Simbolo($2, 'bool', $4, @2.first_line, @2.first_column);
+        tablaSimbolos.guardar($2, 'bool', $4, @2.first_line, @2.first_column);
+    }
+| CHAR ID ASIGNACION CARACTER
+    { 
+        $$ = new Simbolo($2, 'char', $4, @2.first_line, @2.first_column);
+        tablaSimbolos.guardar($2, 'char', $4, @2.first_line, @2.first_column);
+    }
+| STD DPS DPS STRING ID ASIGNACION CADENA 
+    { 
+        $$ = new Simbolo($5, 'string', $7, @5.first_line, @5.first_column);
+        tablaSimbolos.guardar($5, 'string', $7, @5.first_line, @5.first_column);
+    }    
 ;
 
 relacionales
