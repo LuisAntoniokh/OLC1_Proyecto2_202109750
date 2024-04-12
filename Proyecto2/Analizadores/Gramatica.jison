@@ -11,6 +11,10 @@
     const {AST} = require("../dist/src/AST");
     const {Simbolo} = require("../dist/src/TablaSimbolos/Simbolo");
     const {TablaSimbolos} = require("../dist/src/TablaSimbolos/Tablita");
+    const {Ternario} = require("../dist/src/Instruccion/Control/Ternario");
+    const {Switch} = require("../dist/src/Instruccion/Control/Switch");
+    const {Case} = require("../dist/src/Instruccion/Case");
+    const {Default} = require("../dist/src/Instruccion/Default");
     let tablaSimbolos = new TablaSimbolos();
 %}
 
@@ -113,7 +117,7 @@
 
 // Cadenas             "asdfasdfasf"
 \"[^\"]*\"				{ yytext = yytext.substr(1,yyleng-2); return 'CADENA'; }
-\'[a-zA-Z0-9]\'				{ yytext = yytext.substr(1,yyleng-2); return 'CARACTER'; }
+\'[a-zA-Z0-9]\'				{ yytext = yytext.substr(1,yyleng-2); return 'CARACTER'; } 
 <<EOF>>                 return 'EOF';
 
 .					   {    console.log(yylloc.first_line, yylloc.first_column,'Lexico',yytext);    }
@@ -130,7 +134,7 @@
 %left 'MUL','DIV', 'MOD'
 %left 'POW'
 %right UMINUS 
-
+%left QMARK DPS
 // Inicio de gramática
 %start ini
 
@@ -148,26 +152,26 @@ instruccion: EXEC expresion PYC         { $$ =  $2;}
             | fn_print PYC               { $$ = $1;}
             | declaracion PYC              { $$ = $1;}
             | fn_if                     { $$ = $1;}
+            | fn_switch                 { $$ = $1;}
 ;
 
 // Para sitetisar un dato, se utiliza $$
 expresion: RES expresion %prec UMINUS   { $$ = new Aritmetica(new Primitivo(0,0,0),$2,OpAritmetica.RESTA,0,0);} 
-        | expresion MAS expresion      { $$ = new Aritmetica($1,$3,OpAritmetica.SUMA,0,0);}
+        | expresion MAS expresion       { $$ = new Aritmetica($1,$3,OpAritmetica.SUMA,0,0);}
         | expresion RES expresion       { $$ = new Aritmetica($1,$3,OpAritmetica.RESTA,0,0);}
         | expresion MUL expresion       { $$ =  new Aritmetica($1,$3,OpAritmetica.PRODUCTO,0,0);}
         | expresion DIV expresion       { $$ =  new Aritmetica($1,$3,OpAritmetica.DIVISION,0,0);}
         | expresion MOD expresion       { $$ =  new Aritmetica($1,$3,OpAritmetica.MODULO,0,0);}
         | POW PARIZQ expresion COMA expresion PARDER    { $$ =  new Aritmetica($3,$5,OpAritmetica.POTENCIA,0,0);}
-        | relacionales                   { $$ = $1;}
-        | logicos                   { $$ = $1;}
+        | relacionales                  { $$ = $1.interpretar();}
+        | logicos                       { $$ = $1;}
         | NUMBER                        { $$ = new Primitivo($1,TipoDato.NUMBER,0,0); }
         | DOUBLE                        { $$ =  new Primitivo($1,TipoDato.DOUBLE,0,0); }
-        | TRUE                        { $$ =  new Primitivo($1,TipoDato.BOOLEANO,0,0); }
-        | FALSE                        { $$ =  new Primitivo($1,TipoDato.BOOLEANO,0,0); }
+        | TRUE                          { $$ =  new Primitivo($1,TipoDato.BOOLEANO,0,0); }
+        | FALSE                         { $$ =  new Primitivo($1,TipoDato.BOOLEANO,0,0); }
         | CADENA                        { $$ =  new Primitivo($1,TipoDato.STRING,0,0); }
-        | PARIZQ expresion PARDER        { $$ = $2;}
-        | ID {
-    let simbolo = tablaSimbolos.obtener($1);
+        | PARIZQ expresion PARDER       { $$ = $2;}
+        | ID                            { let simbolo = tablaSimbolos.obtener($1);
     if (simbolo) {
         $$ = new Primitivo(simbolo.valor, simbolo.tipo, @1.first_line, @1.first_column);
     } else {
@@ -177,35 +181,35 @@ expresion: RES expresion %prec UMINUS   { $$ = new Aritmetica(new Primitivo(0,0,
 }
 ;
 
-declaracion: INT ID ASIGNACION NUMBER 
+declaracion: INT ID ASIGNACION expresion 
     { 
-        $$ = new Simbolo($2, TipoDato.NUMBER, $4, @2.first_line, @2.first_column);
-        tablaSimbolos.guardar($2, TipoDato.NUMBER, $4, @2.first_line, @2.first_column);
+        let resultadoNumero = $4.interpretar();
+        $$ = new Simbolo($2, TipoDato.NUMBER, resultadoNumero.valor, @2.first_line, @2.first_column);
+        tablaSimbolos.guardar($2, TipoDato.NUMBER, resultadoNumero.valor, @2.first_line, @2.first_column);
     }
-| DOUBLE ID ASIGNACION DOUBLE 
+| DOUBLE ID ASIGNACION expresion 
     { 
-        $$ = new Simbolo($2, 'double', $4, @2.first_line, @2.first_column);
-        tablaSimbolos.guardar($2, 'double', $4, @2.first_line, @2.first_column);
+        let resultadoDouble = $4.interpretar();
+        $$ = new Simbolo($2, TipoDato.DOUBLE, resultadoDouble.valor, @2.first_line, @2.first_column);
+        tablaSimbolos.guardar($2, TipoDato.DOUBLE, resultadoDouble.valor, @2.first_line, @2.first_column);
     }
-| BOOL ID ASIGNACION TRUE 
+| BOOL ID ASIGNACION expresion 
     { 
-        $$ = new Simbolo($2, 'bool', $4, @2.first_line, @2.first_column);
-        tablaSimbolos.guardar($2, 'bool', $4, @2.first_line, @2.first_column);
+        let resultadoBool = $4.interpretar();
+        $$ = new Simbolo($2, TipoDato.BOOLEANO, resultadoBool.valor, @2.first_line, @2.first_column);
+        tablaSimbolos.guardar($2, TipoDato.BOOLEANO, resultadoBool.valor, @2.first_line, @2.first_column);
     }
-| BOOL ID ASIGNACION FALSE 
+| CHAR ID ASIGNACION expresion
     { 
-        $$ = new Simbolo($2, 'bool', $4, @2.first_line, @2.first_column);
-        tablaSimbolos.guardar($2, 'bool', $4, @2.first_line, @2.first_column);
+        let resultadoChar = $4.interpretar();
+        $$ = new Simbolo($2, TipoDato.CHAR, resultadoChar.valor, @2.first_line, @2.first_column);
+        tablaSimbolos.guardar($2, TipoDato.CHAR, resultadoChar.valor, @2.first_line, @2.first_column);
     }
-| CHAR ID ASIGNACION CARACTER
+| STD DPS DPS STRING ID ASIGNACION expresion 
     { 
-        $$ = new Simbolo($2, 'char', $4, @2.first_line, @2.first_column);
-        tablaSimbolos.guardar($2, 'char', $4, @2.first_line, @2.first_column);
-    }
-| STD DPS DPS STRING ID ASIGNACION CADENA 
-    { 
-        $$ = new Simbolo($5, 'string', $7, @5.first_line, @5.first_column);
-        tablaSimbolos.guardar($5, 'string', $7, @5.first_line, @5.first_column);
+        let resultadoString = $7.interpretar();
+        $$ = new Simbolo($5, TipoDato.STRING, resultadoString.valor, @5.first_line, @5.first_column);
+        tablaSimbolos.guardar($5, TipoDato.STRING, resultadoString.valor, @5.first_line, @5.first_column);
     }    
 ;
 
@@ -214,7 +218,7 @@ relacionales
         | expresion DISTINTO expresion    { $$ =  new Relacional($1,$3,OpRelacional.DISTINTO,0,0);}
         | expresion MENOR expresion       { $$ =  new Relacional($1,$3,OpRelacional.MENOR,0,0);}
         | expresion MENORIGUAL expresion  { $$ =  new Relacional($1,$3,OpRelacional.MENORIGUAL,0,0);}
-        | expresion MAYOR expresion       { $$ =  new Relacional($1,$3,OpRelacional.MAYOR,0,0);}
+        | expresion MAYOR expresion       { $$ =  new Relacional($1.valor,$3,OpRelacional.MAYOR,0,0);}
         | expresion MAYORIGUAL expresion  { $$ =  new Relacional($1,$3,OpRelacional.MAYORIGUAL,0,0);}
 ;
 
@@ -224,17 +228,33 @@ logicos
         | NOT expresion                 { $$ =  new Logico(null,$2,OpLogico.NOT,0,0);}
 ;
 
-fn_print: COUT CPR expresion { $$ = new Print($3); }
-        | COUT CPR expresion CPR ENDL { $$ = new Print($3,true,0,0)}
+fn_print: COUT CPR expresion            { $$ = new Print($3); }
+        | COUT CPR expresion CPR ENDL   { $$ = new Print($3,true,0,0)}
 ;
 // Bloque de instrucciones
 bloque
-        : LLAVEIZQ instrucciones LLAVEDER      { $$= new Bloque($2);}
-        | LLAVEIZQ  LLAVEDER                    { $$ = new Bloque([]) }
+        : LLAVEIZQ instrucciones LLAVEDER   { $$ = new Bloque($2);}
+        | LLAVEIZQ  LLAVEDER                { $$ = new Bloque([]) }
 ;
 // Sentencia de control
 fn_if
-        : IF PARIZQ expresion PARDER bloque     { $$ = new FN_IF($3,$5,null,0,0);}
-        | IF PARIZQ expresion PARDER bloque ELSE bloque     { $$ = new FN_IF($3,$5,$7,0,0);}
-        | IF PARIZQ expresion PARDER bloque ELSE fn_if     { $$ = new FN_IF($3,$5,$7,0,0);}
+        : IF PARIZQ expresion PARDER bloque             { $$ = new FN_IF($3,$5,null,0,0);}
+        | IF PARIZQ expresion PARDER bloque ELSE bloque { $$ = new FN_IF($3,$5,$7,0,0);}
+        | IF PARIZQ expresion PARDER bloque ELSE fn_if  { $$ = new FN_IF($3,$5,$7,0,0);}
 ;
+
+fn_switch
+        : SWITCH PARIZQ expresion PARDER LLAVEIZQ cases LLAVEDER { $$ = new Switch($3,$6,null);}
+        | SWITCH PARIZQ expresion PARDER LLAVEIZQ cases defaults LLAVEDER { $$ = new Switch($3,$6,$7,0,0);}
+        | SWITCH PARIZQ expresion PARDER LLAVEIZQ defaults LLAVEDER { $$ = new Switch($3,null,$5,0,0);}
+;
+
+cases
+    : cases CASE expresion DPS instrucciones { $1.push(new Case($3, $5)); $$ = $1; }
+    | CASE expresion DPS instrucciones { $$ = new Case($2, $4); }
+    ;
+
+default
+    : DEFAULT DPS instrucciones { $$ = new Default($3); }
+    | { $$ = null; }
+    ;

@@ -12,6 +12,7 @@ export class Bloque extends Instruccion{
         this.instrucciones.forEach(instruccion => {
             instruccion.interpretar(consola)
        });
+       console.log("break ");
        return null;
     }
 }

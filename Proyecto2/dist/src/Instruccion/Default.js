@@ -1,18 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Bloque = void 0;
+exports.Default = void 0;
 const Instruccion_1 = require("./Instruccion");
-class Bloque extends Instruccion_1.Instruccion {
+class Default extends Instruccion_1.Instruccion {
     constructor(instrucciones) {
         super(0, 0);
         this.instrucciones = instrucciones;
     }
     interpretar(consola) {
-        this.instrucciones.forEach(instruccion => {
+        for (const instruccion of this.instrucciones) {
             instruccion.interpretar(consola);
-        });
-        console.log("break ");
+        }
         return null;
     }
 }
-exports.Bloque = Bloque;
+exports.Default = Default;

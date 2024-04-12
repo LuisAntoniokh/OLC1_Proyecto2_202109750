@@ -13,7 +13,7 @@ class FN_IF extends Instruccion_1.Instruccion {
     interpretar(consola) {
         const condicion = this.condicion.interpretar();
         if (condicion.tipo != Resultado_1.TipoDato.BOOLEANO)
-            throw Error("La condición no es booleana");
+            throw Error("La condicion no es booleana");
         if (condicion.valor) {
             this.bloqueIf.interpretar(consola);
         }
