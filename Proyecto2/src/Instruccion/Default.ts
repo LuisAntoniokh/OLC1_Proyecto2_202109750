@@ -10,7 +10,8 @@ export class Default extends Instruccion {
 
     public interpretar(consola: string[]): null {
         for (const instruccion of this.instrucciones) {
-            instruccion.interpretar(consola);
+            const result = instruccion.interpretar(consola);
+            console.log(result);
         }
         return null;
     }

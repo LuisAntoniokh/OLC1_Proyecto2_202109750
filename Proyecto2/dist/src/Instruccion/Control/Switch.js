@@ -6,19 +6,25 @@ class Switch extends Instruccion_1.Instruccion {
     constructor(expresion, cases, defaultVAL) {
         super(0, 0);
         this.expresion = expresion;
-        this.cases = cases;
+        this.cases = cases || [];
         this.defaultVAL = defaultVAL;
     }
     interpretar(consola) {
         const valor = this.expresion.interpretar();
+        let matched = false;
         for (const caso of this.cases) {
-            if (caso.expresion.interpretar() === valor) {
+            const result = caso.expresion.interpretar();
+            if (!matched && valor.valor == result.valor) {
+                matched = true;
+            }
+            if (matched) {
                 caso.interpretar(consola);
-                console.log("break ");
-                return null;
+                if (caso.hasbreak) {
+                    break;
+                }
             }
         }
-        if (this.defaultVAL) {
+        if (!matched && this.defaultVAL) {
             this.defaultVAL.interpretar(consola);
         }
         return null;

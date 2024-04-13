@@ -246,15 +246,18 @@ fn_if
 fn_switch
         : SWITCH PARIZQ expresion PARDER LLAVEIZQ cases LLAVEDER { $$ = new Switch($3,$6,null);}
         | SWITCH PARIZQ expresion PARDER LLAVEIZQ cases defaults LLAVEDER { $$ = new Switch($3,$6,$7,0,0);}
-        | SWITCH PARIZQ expresion PARDER LLAVEIZQ defaults LLAVEDER { $$ = new Switch($3,null,$5,0,0);}
+        | SWITCH PARIZQ expresion PARDER LLAVEIZQ defaults LLAVEDER { $$ = new Switch($3,null,$6,0,0);}
 ;
 
 cases
-    : cases CASE expresion DPS instrucciones { $1.push(new Case($3, $5)); $$ = $1; }
-    | CASE expresion DPS instrucciones { $$ = new Case($2, $4); }
-    ;
+    : cases CASE expresion DPS instrucciones bkpyc{ $1.push(new Case($3, $5)); $$ = $1; }
+    | CASE expresion DPS instrucciones bkpyc { $$ = [new Case($2, $4)]; }
+;
 
-default
-    : DEFAULT DPS instrucciones { $$ = new Default($3); }
+bkpyc: BREAK PYC { $$ = $1; }
     | { $$ = null; }
-    ;
+;
+
+defaults
+    : DEFAULT DPS instrucciones bkpyc{ $$ = new Default($3); }
+;

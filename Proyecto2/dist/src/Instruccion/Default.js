@@ -9,7 +9,8 @@ class Default extends Instruccion_1.Instruccion {
     }
     interpretar(consola) {
         for (const instruccion of this.instrucciones) {
-            instruccion.interpretar(consola);
+            const result = instruccion.interpretar(consola);
+            console.log(result);
         }
         return null;
     }

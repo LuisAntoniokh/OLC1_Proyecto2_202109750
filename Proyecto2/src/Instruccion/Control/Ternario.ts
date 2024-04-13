@@ -22,7 +22,7 @@ export class Ternario extends Expresion {
         if (condicion.valor) {
             this.expresionVerdadera.interpretar()
         } else {
-            console.log("else")
+            console.log("else ")
             console.log({else:this.expresionFalsa})
             this.expresionFalsa.interpretar()
         }

@@ -5,7 +5,7 @@ export class Case extends Instruccion {
     expresion: Expresion;
     instrucciones: Instruccion[];
 
-    constructor(expresion: Expresion, instrucciones: Instruccion[]) {
+    constructor(expresion: Expresion, instrucciones: Instruccion[], public hasbreak: boolean) {
         super(0, 0);
         this.expresion = expresion;
         this.instrucciones = instrucciones;
@@ -13,8 +13,8 @@ export class Case extends Instruccion {
 
     public interpretar(consola: string[]): null {
         for (const instruccion of this.instrucciones) {
-            instruccion.interpretar(consola);
-            console.log("break");
+            const result = instruccion.interpretar(consola);
+            console.log(result);
         }
         return null;
     }

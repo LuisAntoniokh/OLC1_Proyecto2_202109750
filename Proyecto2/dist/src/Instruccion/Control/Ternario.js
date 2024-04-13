@@ -18,7 +18,7 @@ class Ternario extends Expresion_1.Expresion {
             this.expresionVerdadera.interpretar();
         }
         else {
-            console.log("else");
+            console.log("else ");
             console.log({ else: this.expresionFalsa });
             this.expresionFalsa.interpretar();
         }
