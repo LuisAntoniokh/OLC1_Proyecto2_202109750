@@ -1,20 +1,32 @@
+import { TipoDato } from "../Expresion/Resultado";
+
 export class Simbolo {
     public nombre: string;
-    public tipo: string;
-    public valor: any;
+    public tipo: TipoDato;
+    public valor: Object;
     public fila: number;
     public columna: number;
+    public tipoSimbolo: tipoSimbolo;
 
-    constructor(nombre: string, tipo: string, valor: any, fila: number, columna: number) {
+    constructor(nombre: string, tipo: TipoDato, valor: Object, fila: number, columna: number, tipoSimbolo: tipoSimbolo) {
         this.nombre = nombre;
         this.tipo = tipo;
         this.valor = valor;
         this.fila = fila;
         this.columna = columna;
+        this.tipoSimbolo = tipoSimbolo;
     }
 
-    interpretar(consola: string[]): void {
-        
-        //consola.push(this.valor + "\n");
+    //interpretar(consola: string[]): void { consola.push(this.valor + "\n");}
+    public obtenerValor():Object{
+        return this.valor
     }
+    
+    public actualizarValor(valor:Object){
+        this.valor = valor
+    }
+}
+
+export enum tipoSimbolo {
+    VARIABLE
 }

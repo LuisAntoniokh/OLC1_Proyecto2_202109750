@@ -1,23 +1,17 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AST = void 0;
+const Tablita_1 = require("./TablaSimbolos/Tablita");
 class AST {
     constructor(instrucciones) {
         this.instrucciones = instrucciones;
         this.consola = [];
+        this.contextoGlobal = new Tablita_1.Contexto(null);
     }
     Ejecutar() {
         // Primera pasada
         this.instrucciones.forEach(instruccion => {
-            if (typeof instruccion.interpretar === 'function') {
-                let resultado = instruccion.interpretar(this.consola);
-                if (resultado !== null && resultado !== undefined) {
-                    this.consola.push(resultado);
-                }
-            }
-            else {
-                console.error(`Error: La instrucción de tipo ${instruccion.constructor.name} no tiene un método interpretar.`);
-            }
+            instruccion.interpretar(this.contextoGlobal, this.consola);
         });
     }
     getConsola() {

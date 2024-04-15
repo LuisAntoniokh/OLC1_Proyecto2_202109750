@@ -2,6 +2,8 @@ import { Expresion } from "../../Expresion/Expresion";
 import { Case } from "../Case";
 import { Default } from "../Default";
 import { Instruccion } from "../Instruccion";
+import { Contexto } from "../../TablaSimbolos/Tablita";
+import { Break } from "./Break";
 
 export class Switch extends Instruccion {
     expresion: Expresion;
@@ -15,26 +17,26 @@ export class Switch extends Instruccion {
         this.defaultVAL = defaultVAL;
     }
 
-    public interpretar(consola: string[]): null {
-        const valor = this.expresion.interpretar();
+    public interpretar(contexto: Contexto, consola: string[]): null | string {
+        const valor = this.expresion.interpretar(contexto);
         let matched = false;
         for (const caso of this.cases) {
-            const result = caso.expresion.interpretar();
+            const result = caso.expresion.interpretar(contexto);
             if (!matched && valor.valor == result.valor) {
                 matched = true;
-            }
-            if (matched) {
-                caso.interpretar(consola);
-                if (caso.hasbreak) {
+                const messi = caso.interpretar(contexto, consola);
+                if(messi?.includes("break")){
                     break;
+                } else {
+                    continue;
                 }
             }
         }
-
+    
         if (!matched && this.defaultVAL) {
-            this.defaultVAL.interpretar(consola);
+            this.defaultVAL.interpretar(contexto, consola);
         }
-
+    
         return null;
     }
 }

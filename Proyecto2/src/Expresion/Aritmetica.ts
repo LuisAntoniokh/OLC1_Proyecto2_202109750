@@ -1,5 +1,6 @@
 import { Expresion } from "./Expresion";
 import { OpAritmetica, Resultado,TipoDato } from "./Resultado";
+import { Contexto } from "../TablaSimbolos/Tablita";
 
 export class Aritmetica extends Expresion{
     public exp1:Expresion;
@@ -13,10 +14,10 @@ export class Aritmetica extends Expresion{
         this.exp1 = e1;
         this.exp2 = e2
     }
-    public interpretar(): Resultado {
+    public interpretar(contexto:Contexto): Resultado {
         // Ejecutamos los noterminales
-        const resultadoIzq = this.exp1.interpretar()
-        const resultadoDer = this.exp2.interpretar()
+        const resultadoIzq = this.exp1.interpretar(contexto)
+        const resultadoDer = this.exp2.interpretar(contexto)
         // Lógica del intérprete
         // Comparamos el tipo de operación
         if (this.Operacion == OpAritmetica.SUMA){

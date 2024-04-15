@@ -1,26 +1,22 @@
 import { Expresion } from "./Expresion/Expresion";
 import { Instruccion } from "./Instruccion/Instruccion";
+import { Contexto } from "./TablaSimbolos/Tablita";
 
 export class AST {
     public instrucciones: Instruccion[]
     public consola:string[]
+    public contextoGlobal:Contexto    
     constructor(instrucciones: Instruccion[]){
         this.instrucciones = instrucciones
         this.consola = []
+        this.contextoGlobal = new Contexto(null)
     }
 
     public Ejecutar(){
         // Primera pasada
         this.instrucciones.forEach(instruccion => {
-            if (typeof instruccion.interpretar === 'function') {
-                let resultado = instruccion.interpretar(this.consola);
-                if (resultado !== null && resultado !== undefined) {
-                    this.consola.push(resultado);
-                }
-            } else {
-                console.error(`Error: La instrucción de tipo ${instruccion.constructor.name} no tiene un método interpretar.`);
-            }
-        });
+            instruccion.interpretar(this.contextoGlobal,this.consola)
+       });
      }
      
      public getConsola(){

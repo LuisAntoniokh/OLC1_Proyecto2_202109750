@@ -1,4 +1,5 @@
 import { Instruccion } from "./Instruccion";
+import { Contexto } from "../TablaSimbolos/Tablita";
 
 export class Default extends Instruccion {
     instrucciones: Instruccion[];
@@ -8,10 +9,13 @@ export class Default extends Instruccion {
         this.instrucciones = instrucciones;
     }
 
-    public interpretar(consola: string[]): null {
+    public interpretar(contexto:Contexto ,consola: string[]): null | string {
         for (const instruccion of this.instrucciones) {
-            const result = instruccion.interpretar(consola);
+            const result = instruccion.interpretar(contexto, consola);
             console.log(result);
+            if (result == "break") {
+                return "break";
+            }
         }
         return null;
     }

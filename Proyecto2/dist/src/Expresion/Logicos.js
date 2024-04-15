@@ -12,11 +12,11 @@ class Logico extends Expresion_1.Expresion {
         this.exp1 = e1;
         this.exp2 = e2;
     }
-    interpretar() {
+    interpretar(contexto) {
         let resultado1 = null;
         if (this.Operacion != Resultado_1.OpLogico.NOT)
-            resultado1 = this.exp1.interpretar();
-        const resultado2 = this.exp2.interpretar();
+            resultado1 = this.exp1.interpretar(contexto);
+        const resultado2 = this.exp2.interpretar(contexto);
         if (this.Operacion == Resultado_1.OpLogico.AND) {
             if ((resultado1 === null || resultado1 === void 0 ? void 0 : resultado1.tipo) == Resultado_1.TipoDato.BOOLEANO && resultado2.tipo == Resultado_1.TipoDato.BOOLEANO)
                 return { tipo: Resultado_1.TipoDato.BOOLEANO, valor: resultado1.valor && resultado2.valor };

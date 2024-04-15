@@ -1,4 +1,5 @@
 import { Resultado } from "./Resultado";
+import { Contexto } from "../TablaSimbolos/Tablita";
 
 export abstract class  Expresion{
     public line: number;
@@ -9,6 +10,6 @@ export abstract class  Expresion{
         this.column = colum;
     }
     // Método que siempre debe ejecutarse en todos los objetos que hereda
-    public abstract interpretar():Resultado
+    public abstract interpretar(contexto:Contexto):Resultado
         
  }

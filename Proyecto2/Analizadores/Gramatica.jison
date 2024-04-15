@@ -15,7 +15,11 @@
     const {Switch} = require("../dist/src/Instruccion/Control/Switch");
     const {Case} = require("../dist/src/Instruccion/Case");
     const {Default} = require("../dist/src/Instruccion/Default");
-    let tablaSimbolos = new TablaSimbolos();
+    const {Acceso} = require("../dist/src/Expresion/Acceso");
+    const {Asignacion} = require("../dist/src/Instruccion/Asignacion");
+    const {Break} = require("../dist/src/Instruccion/Control/Break");
+    const {CWhile} = require("../dist/src/Instruccion/Ciclos/While");
+    const {Declaracion} = require("../dist/src/Instruccion/Definiciones/Declaracion");
 %}
 
 %lex // Inicia parte léxica
@@ -117,7 +121,7 @@
 
 // Cadenas             "asdfasdfasf"
 \"[^\"]*\"				{ yytext = yytext.substr(1,yyleng-2); return 'CADENA'; }
-\'[a-zA-Z0-9]\'				{ yytext = yytext.substr(1,yyleng-2); return 'CARACTER'; } 
+\'[a-zA-Z0-9]\'		    { yytext = yytext.substr(1,yyleng-2); return 'CARACTER'; } 
 <<EOF>>                 return 'EOF';
 
 .					   {    console.log(yylloc.first_line, yylloc.first_column,'Lexico',yytext);    }
@@ -141,7 +145,7 @@
 // Parte sintáctica  - Definición de la gramática
 %%
 
-ini : instrucciones EOF { tablaSimbolos.imprimir(); return new AST($1);}
+ini : instrucciones EOF { return new AST($1); }
 ;
 
 instrucciones: instrucciones instruccion    {  $1.push($2); $$ = $1;}
@@ -149,10 +153,13 @@ instrucciones: instrucciones instruccion    {  $1.push($2); $$ = $1;}
 ;
 
 instruccion: EXEC expresion PYC         { $$ =  $2;}
-            | fn_print PYC               { $$ = $1;}
-            | declaracion PYC              { $$ = $1;}
+            | fn_print PYC              { $$ = $1;}
+            | declaracion PYC           { $$ = $1;}
             | fn_if                     { $$ = $1;}
             | fn_switch                 { $$ = $1;}
+            | asignacion PYC            { $$ = $1;}
+            | ciclo_while               { $$ = $1;}
+            | inst_break PYC            { $$ = $1;}
 ;
 
 // Para sitetisar un dato, se utiliza $$
@@ -163,7 +170,7 @@ expresion: RES expresion %prec UMINUS   { $$ = new Aritmetica(new Primitivo(0,0,
         | expresion DIV expresion       { $$ =  new Aritmetica($1,$3,OpAritmetica.DIVISION,0,0);}
         | expresion MOD expresion       { $$ =  new Aritmetica($1,$3,OpAritmetica.MODULO,0,0);}
         | POW PARIZQ expresion COMA expresion PARDER    { $$ =  new Aritmetica($3,$5,OpAritmetica.POTENCIA,0,0);}
-        | relacionales                  { $$ = $1.interpretar();}
+        | relacionales                  { $$ = $1;}
         | logicos                       { $$ = $1;}
         | NUMBER                        { $$ = new Primitivo($1,TipoDato.NUMBER,0,0); }
         | DOUBLE                        { $$ =  new Primitivo($1,TipoDato.DOUBLE,0,0); }
@@ -171,46 +178,24 @@ expresion: RES expresion %prec UMINUS   { $$ = new Aritmetica(new Primitivo(0,0,
         | FALSE                         { $$ =  new Primitivo($1,TipoDato.BOOLEANO,0,0); }
         | CADENA                        { $$ =  new Primitivo($1,TipoDato.STRING,0,0); }
         | PARIZQ expresion PARDER       { $$ = $2;}
-        | ID                            { let simbolo = tablaSimbolos.obtener($1);
-    if (simbolo) {
-        $$ = new Primitivo(simbolo.valor, simbolo.tipo, @1.first_line, @1.first_column);
-    } else {
-        console.error(`Error: Variable ${$1} no definida.`);
-        $$ = new Primitivo(null, TipoDato.NULO, @1.first_line, @1.first_column);
-    }
-}
+        | CARACTER                      { $$ =  new Primitivo($1,TipoDato.CHAR,0,0); }
+        | ID                            { $$ = new Acceso($1,@1.first_line,@1.first_column);}
 ;
 
-declaracion: INT ID ASIGNACION expresion 
-    { 
-        let resultadoNumero = $4.interpretar();
-        $$ = new Simbolo($2, TipoDato.NUMBER, resultadoNumero.valor, @2.first_line, @2.first_column);
-        tablaSimbolos.guardar($2, TipoDato.NUMBER, resultadoNumero.valor, @2.first_line, @2.first_column);
-    }
-| DOUBLE ID ASIGNACION expresion 
-    { 
-        let resultadoDouble = $4.interpretar();
-        $$ = new Simbolo($2, TipoDato.DOUBLE, resultadoDouble.valor, @2.first_line, @2.first_column);
-        tablaSimbolos.guardar($2, TipoDato.DOUBLE, resultadoDouble.valor, @2.first_line, @2.first_column);
-    }
-| BOOL ID ASIGNACION expresion 
-    { 
-        let resultadoBool = $4.interpretar();
-        $$ = new Simbolo($2, TipoDato.BOOLEANO, resultadoBool.valor, @2.first_line, @2.first_column);
-        tablaSimbolos.guardar($2, TipoDato.BOOLEANO, resultadoBool.valor, @2.first_line, @2.first_column);
-    }
-| CHAR ID ASIGNACION expresion
-    { 
-        let resultadoChar = $4.interpretar();
-        $$ = new Simbolo($2, TipoDato.CHAR, resultadoChar.valor, @2.first_line, @2.first_column);
-        tablaSimbolos.guardar($2, TipoDato.CHAR, resultadoChar.valor, @2.first_line, @2.first_column);
-    }
-| STD DPS DPS STRING ID ASIGNACION expresion 
-    { 
-        let resultadoString = $7.interpretar();
-        $$ = new Simbolo($5, TipoDato.STRING, resultadoString.valor, @5.first_line, @5.first_column);
-        tablaSimbolos.guardar($5, TipoDato.STRING, resultadoString.valor, @5.first_line, @5.first_column);
-    }    
+declaracion: tipos ID ASIGNACION expresion  { $$ = new Declaracion($1, $2, $4, @2.first_line, @2.first_column)};
+
+asignacion: ID ASIGNACION expresion         { $$ = new Asignacion($1,$3,@1.first_line,@1.first_column)};
+
+ciclo_while: WHILE PARIZQ expresion PARDER bloque   {$$ = new CWhile($3,$5, @1.first_line, @1.first_column)} ;
+
+inst_break: BREAK PYC {$$ = new Break(@1.first_line,@1.first_column)}
+        | ;
+
+tipos: INT      { $$ = TipoDato.NUMBER; }
+    | DOUBLE    { $$ = TipoDato.DOUBLE; }
+    | BOOL      { $$ = TipoDato.BOOLEANO; }
+    | CHAR      { $$ = TipoDato.CHAR; }
+    | STD DPS DPS STRING { $$ = TipoDato.STRING; }
 ;
 
 relacionales
@@ -250,14 +235,10 @@ fn_switch
 ;
 
 cases
-    : cases CASE expresion DPS instrucciones bkpyc{ $1.push(new Case($3, $5)); $$ = $1; }
-    | CASE expresion DPS instrucciones bkpyc { $$ = [new Case($2, $4)]; }
-;
-
-bkpyc: BREAK PYC { $$ = $1; }
-    | { $$ = null; }
+    : cases CASE expresion DPS instrucciones inst_break { $1.push(new Case($3, $5)); $$ = $1; }
+    | CASE expresion DPS instrucciones inst_break { $$ = [new Case($2, $4)]; }
 ;
 
 defaults
-    : DEFAULT DPS instrucciones bkpyc{ $$ = new Default($3); }
+    : DEFAULT DPS instrucciones inst_break { $$ = new Default($3); }
 ;

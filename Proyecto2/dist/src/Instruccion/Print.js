@@ -9,8 +9,8 @@ class Print extends Instruccion_1.Instruccion {
         this.expresion = expresion;
         this.salto = salto;
     }
-    interpretar(consola) {
-        const res = this.expresion.interpretar();
+    interpretar(contexto, consola) {
+        const res = this.expresion.interpretar(contexto);
         if (res.tipo == Resultado_1.TipoDato.BOOLEANO) {
             res.valor = res.valor ? "true" : "false";
         }

@@ -1,5 +1,6 @@
 import { Expresion } from "./Expresion";
 import { OpLogico, Resultado, TipoDato } from "./Resultado";
+import { Contexto } from "../TablaSimbolos/Tablita";
 
 export class Logico extends Expresion{
     
@@ -15,12 +16,12 @@ export class Logico extends Expresion{
         this.exp2 = e2
     }
  
-    public interpretar(): Resultado {
+    public interpretar(contexto:Contexto): Resultado {
         let resultado1 = null
         if (this.Operacion!=OpLogico.NOT)
-            resultado1 =  this.exp1.interpretar()
-        const resultado2 = this.exp2.interpretar() 
-
+            resultado1 =  this.exp1.interpretar(contexto)
+        const resultado2 = this.exp2.interpretar(contexto) 
+        
         if (this.Operacion== OpLogico.AND){
             if(resultado1?.tipo==TipoDato.BOOLEANO && resultado2.tipo==TipoDato.BOOLEANO)
                 return {tipo:TipoDato.BOOLEANO,valor:resultado1.valor&&resultado2.valor}

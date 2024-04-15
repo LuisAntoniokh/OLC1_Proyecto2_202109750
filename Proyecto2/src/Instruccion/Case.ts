@@ -1,4 +1,5 @@
 import { Expresion } from "../Expresion/Expresion";
+import { Contexto } from "../TablaSimbolos/Tablita";
 import { Instruccion } from "./Instruccion";
 
 export class Case extends Instruccion {
@@ -11,10 +12,13 @@ export class Case extends Instruccion {
         this.instrucciones = instrucciones;
     }
 
-    public interpretar(consola: string[]): null {
+    public interpretar(contexto: Contexto, consola: string[]): null | string {
         for (const instruccion of this.instrucciones) {
-            const result = instruccion.interpretar(consola);
+            const result = instruccion.interpretar(contexto, consola);
             console.log(result);
+            if (result == "break") {
+                return "break";
+            }
         }
         return null;
     }

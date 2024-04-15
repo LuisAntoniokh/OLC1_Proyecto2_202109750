@@ -7,10 +7,13 @@ class Default extends Instruccion_1.Instruccion {
         super(0, 0);
         this.instrucciones = instrucciones;
     }
-    interpretar(consola) {
+    interpretar(contexto, consola) {
         for (const instruccion of this.instrucciones) {
-            const result = instruccion.interpretar(consola);
+            const result = instruccion.interpretar(contexto, consola);
             console.log(result);
+            if (result == "break") {
+                return "break";
+            }
         }
         return null;
     }

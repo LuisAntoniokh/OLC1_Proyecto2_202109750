@@ -9,23 +9,24 @@ class Switch extends Instruccion_1.Instruccion {
         this.cases = cases || [];
         this.defaultVAL = defaultVAL;
     }
-    interpretar(consola) {
-        const valor = this.expresion.interpretar();
+    interpretar(contexto, consola) {
+        const valor = this.expresion.interpretar(contexto);
         let matched = false;
         for (const caso of this.cases) {
-            const result = caso.expresion.interpretar();
+            const result = caso.expresion.interpretar(contexto);
             if (!matched && valor.valor == result.valor) {
                 matched = true;
-            }
-            if (matched) {
-                caso.interpretar(consola);
-                if (caso.hasbreak) {
+                const messi = caso.interpretar(contexto, consola);
+                if (messi === null || messi === void 0 ? void 0 : messi.includes("break")) {
                     break;
+                }
+                else {
+                    continue;
                 }
             }
         }
         if (!matched && this.defaultVAL) {
-            this.defaultVAL.interpretar(consola);
+            this.defaultVAL.interpretar(contexto, consola);
         }
         return null;
     }

@@ -3,7 +3,7 @@ import { Resultado, TipoDato } from "../../Expresion/Resultado";
 import { Bloque } from "../Bloque";
 import { Instruccion } from "../Instruccion";
 
-export class Ternario extends Expresion {
+/*export class Ternario extends Expresion {
     condicion: Expresion
     expresionVerdadera: Expresion
     expresionFalsa: Expresion
@@ -28,4 +28,4 @@ export class Ternario extends Expresion {
         }
         return { tipo: TipoDato.NULO, valor: null}
     }
-}
+}*/

@@ -1,4 +1,6 @@
-export abstract class  Instruccion{
+import { Contexto } from "../TablaSimbolos/Tablita";
+
+export abstract class Instruccion{
     public line: number;
     public column: number; 
     // Esta clase siempre pedirá línea y columna
@@ -7,6 +9,6 @@ export abstract class  Instruccion{
         this.column = colum;
     }
     // Método que siempre debe ejecutarse en todos los objetos que hereda
-    public abstract interpretar(consola:string[]):null
-        
+    public abstract interpretar(contexto:Contexto,consola:string[]):null | string
+   
  }
