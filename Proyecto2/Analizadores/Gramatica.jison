@@ -20,6 +20,7 @@
     const {Break} = require("../dist/src/Instruccion/Control/Break");
     const {CWhile} = require("../dist/src/Instruccion/Ciclos/While");
     const {Declaracion} = require("../dist/src/Instruccion/Definiciones/Declaracion");
+    const {CDoWhile} = require("../dist/src/Instruccion/Ciclos/DoWhile");
 %}
 
 %lex // Inicia parte léxica
@@ -160,6 +161,7 @@ instruccion: EXEC expresion PYC         { $$ =  $2;}
             | asignacion PYC            { $$ = $1;}
             | ciclo_while               { $$ = $1;}
             | inst_break PYC            { $$ = $1;}
+            | ciclo_do_while            { $$ = $1;}
 ;
 
 // Para sitetisar un dato, se utiliza $$
@@ -188,8 +190,9 @@ asignacion: ID ASIGNACION expresion         { $$ = new Asignacion($1,$3,@1.first
 
 ciclo_while: WHILE PARIZQ expresion PARDER bloque   {$$ = new CWhile($3,$5, @1.first_line, @1.first_column)} ;
 
-inst_break: BREAK PYC {$$ = new Break(@1.first_line,@1.first_column)}
-        | ;
+ciclo_do_while: DO bloque WHILE PARIZQ expresion PARDER PYC {$$ = new CDoWhile($5,$2, @1.first_line, @1.first_column)} ;
+
+inst_break: BREAK PYC {$$ = new Break(@1.first_line,@1.first_column)};
 
 tipos: INT      { $$ = TipoDato.NUMBER; }
     | DOUBLE    { $$ = TipoDato.DOUBLE; }
