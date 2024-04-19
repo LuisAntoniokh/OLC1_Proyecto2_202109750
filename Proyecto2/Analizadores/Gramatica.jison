@@ -21,6 +21,9 @@
     const {CWhile} = require("../dist/src/Instruccion/Ciclos/While");
     const {Declaracion} = require("../dist/src/Instruccion/Definiciones/Declaracion");
     const {CDoWhile} = require("../dist/src/Instruccion/Ciclos/DoWhile");
+    const {Incremento} = require("../dist/src/Instruccion/Ciclos/Incremento");
+    const {Decremento} = require("../dist/src/Instruccion/Ciclos/Decremento");
+    const {CFor} = require("../dist/src/Instruccion/Ciclos/For");
 %}
 
 %lex // Inicia parte léxica
@@ -158,10 +161,11 @@ instruccion: EXEC expresion PYC         { $$ =  $2;}
             | declaracion PYC           { $$ = $1;}
             | fn_if                     { $$ = $1;}
             | fn_switch                 { $$ = $1;}
-            | asignacion PYC            { $$ = $1;}
+            | incre_o_decre PYC            { $$ = $1;}
             | ciclo_while               { $$ = $1;}
             | inst_break PYC            { $$ = $1;}
             | ciclo_do_while            { $$ = $1;}
+            | ciclo_for                 { $$ = $1;}
 ;
 
 // Para sitetisar un dato, se utiliza $$
@@ -191,6 +195,17 @@ asignacion: ID ASIGNACION expresion         { $$ = new Asignacion($1,$3,@1.first
 ciclo_while: WHILE PARIZQ expresion PARDER bloque   {$$ = new CWhile($3,$5, @1.first_line, @1.first_column)} ;
 
 ciclo_do_while: DO bloque WHILE PARIZQ expresion PARDER PYC {$$ = new CDoWhile($5,$2, @1.first_line, @1.first_column)} ;
+
+decla_o_asigna: declaracion  { $$ = $1;}
+        | asignacion   { $$ = $1;}
+;
+
+incre_o_decre: asignacion { $$ = $1;}
+        | ID MAS MAS { $$ = new Incremento($1,@1.first_line,@1.first_column);}
+        | ID RES RES { $$ = new Decremento($1,@1.first_line,@1.first_column);}
+;
+
+ciclo_for: FOR PARIZQ decla_o_asigna PYC relacionales PYC incre_o_decre PARDER bloque {$$ = new CFor($3,$5,$7,$9,@1.first_line,@1.first_column)} ;
 
 inst_break: BREAK PYC {$$ = new Break(@1.first_line,@1.first_column)};
 

@@ -1,0 +1,23 @@
+Comentarios.
+
+Secuencias de escape(?)
+
+Ternario.
+
+Creacion de varios ID con valores default.
+
+Casteos.
+
+Vectores (Todo).
+
+Continue y return.
+
+Funciones, metodos y llamadas.
+
+Tolower, toupper, round.
+
+Length, typeOf, toString, c_str.
+
+Reportes y manuales.
+
+
