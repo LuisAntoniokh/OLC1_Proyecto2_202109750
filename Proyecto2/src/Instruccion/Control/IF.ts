@@ -24,7 +24,7 @@ export class FN_IF extends Instruccion{
             const retorno =  this.bloqueIf.interpretar(contexto,consola)
             console.log(retorno)
             if (retorno) return retorno
-        }else{
+        } else {
             console.log("else")
             console.log({else:this.bloqueElse})
             const retorno = this.bloqueElse?.interpretar(contexto,consola)

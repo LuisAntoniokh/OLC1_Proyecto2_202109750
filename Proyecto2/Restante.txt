@@ -1,20 +1,20 @@
-Comentarios.
+// Probe y no xd.
 
+Comentarios.
+Ternario.
+Creacion de varios ID con valores default.
+Casteos.
+
+// Ni idea.
 Secuencias de escape(?)
 
-Ternario.
-
-Creacion de varios ID con valores default.
-
-Casteos.
+// Dios plan que va a salir:
 
 Vectores (Todo).
 
-Continue y return.
+Return.
 
 Funciones, metodos y llamadas.
-
-Tolower, toupper, round.
 
 Length, typeOf, toString, c_str.
 

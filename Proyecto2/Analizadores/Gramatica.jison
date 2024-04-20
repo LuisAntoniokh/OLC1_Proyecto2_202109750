@@ -24,6 +24,11 @@
     const {Incremento} = require("../dist/src/Instruccion/Ciclos/Incremento");
     const {Decremento} = require("../dist/src/Instruccion/Ciclos/Decremento");
     const {CFor} = require("../dist/src/Instruccion/Ciclos/For");
+    const {Continue} = require("../dist/src/Instruccion/Control/Continue");
+    const {Casteo} = require("../dist/src/Expresion/Casteos");
+    const {ToLower} = require("../dist/src/Expresion/ToLower");
+    const {ToUpper} = require("../dist/src/Expresion/ToUpper");
+    const {Round} = require("../dist/src/Expresion/Round");
 %}
 
 %lex // Inicia parte léxica
@@ -40,8 +45,8 @@
 [0-9]+\b                return 'NUMBER';
 
 // Tipo de datos
-"INT"                   return 'INT';
-"DOUBLE"                return 'DOUBLE';
+"INT"                   return 'TIPO_INT';
+"DOUBLE"                return 'TIPO_DOUBLE';
 "BOOL"                  return 'BOOL';
 "CHAR"                  return 'CHAR';
 "STRING"                return 'STRING';
@@ -143,6 +148,8 @@
 %left 'POW'
 %right UMINUS 
 %left QMARK DPS
+%nonassoc CAST
+%nonassoc 'PARDER' 
 // Inicio de gramática
 %start ini
 
@@ -161,11 +168,13 @@ instruccion: EXEC expresion PYC         { $$ =  $2;}
             | declaracion PYC           { $$ = $1;}
             | fn_if                     { $$ = $1;}
             | fn_switch                 { $$ = $1;}
-            | incre_o_decre PYC            { $$ = $1;}
+            | incre_o_decre PYC         { $$ = $1;}
             | ciclo_while               { $$ = $1;}
             | inst_break PYC            { $$ = $1;}
             | ciclo_do_while            { $$ = $1;}
             | ciclo_for                 { $$ = $1;}
+            | inst_break                { $$ = $1;}
+            | CONTINUE PYC              { $$ = new Continue(@1.first_line,@1.first_column);}
 ;
 
 // Para sitetisar un dato, se utiliza $$
@@ -186,6 +195,10 @@ expresion: RES expresion %prec UMINUS   { $$ = new Aritmetica(new Primitivo(0,0,
         | PARIZQ expresion PARDER       { $$ = $2;}
         | CARACTER                      { $$ =  new Primitivo($1,TipoDato.CHAR,0,0); }
         | ID                            { $$ = new Acceso($1,@1.first_line,@1.first_column);}
+        | casteos                       { $$ = $1;}
+        | TOLOWER PARIZQ expresion PARDER { $$ = new ToLower($3,@1.first_line,@1.first_column);}
+        | TOUPPER PARIZQ expresion PARDER { $$ = new ToUpper($3,@1.first_line,@1.first_column);}
+        | ROUND PARIZQ expresion PARDER { $$ = new Round($3,@1.first_line,@1.first_column);}
 ;
 
 declaracion: tipos ID ASIGNACION expresion  { $$ = new Declaracion($1, $2, $4, @2.first_line, @2.first_column)};
@@ -209,10 +222,10 @@ ciclo_for: FOR PARIZQ decla_o_asigna PYC relacionales PYC incre_o_decre PARDER b
 
 inst_break: BREAK PYC {$$ = new Break(@1.first_line,@1.first_column)};
 
-tipos: INT      { $$ = TipoDato.NUMBER; }
-    | DOUBLE    { $$ = TipoDato.DOUBLE; }
-    | BOOL      { $$ = TipoDato.BOOLEANO; }
-    | CHAR      { $$ = TipoDato.CHAR; }
+tipos: TIPO_INT              { $$ = TipoDato.NUMBER; }
+    | TIPO_DOUBLE       { $$ = TipoDato.DOUBLE; }
+    | BOOL              { $$ = TipoDato.BOOLEANO; }
+    | CHAR              { $$ = TipoDato.CHAR; }
     | STD DPS DPS STRING { $$ = TipoDato.STRING; }
 ;
 
@@ -259,4 +272,8 @@ cases
 
 defaults
     : DEFAULT DPS instrucciones inst_break { $$ = new Default($3); }
+;
+
+casteos
+    : PARIZQ tipos PARDER expresion %prec 'PARDER' { $$ = new Casteo($2.valor, $4, @1.first_line, @1.first_column); }
 ;

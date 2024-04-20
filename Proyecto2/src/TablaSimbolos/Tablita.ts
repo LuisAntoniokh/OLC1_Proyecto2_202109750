@@ -37,6 +37,17 @@ export class Contexto {
     public actualizarSimbolo(id:string,valor:Simbolo){
         this.tabla.set(id,valor)
     }
+
+    public actualizarTipoSimbolo(id: string, nuevoTipo: TipoDato): void {
+        const simbolo = this.obtenerVariable(id);
+        if (simbolo) {
+            simbolo.tipo = nuevoTipo;
+            this.actualizarSimbolo(id, simbolo);
+        } else {
+            throw new Error(`La variable ${id} no existe en el contexto actual`);
+        }
+    }
+    
     /*public guardarVariable(id:string, valor: string, tipo: TipoDato): void {
         const existe = this.tabla.has(id);
         if (!existe) {
