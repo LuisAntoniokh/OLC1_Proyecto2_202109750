@@ -11,7 +11,7 @@ export class Incremento extends Instruccion {
     }
 
     public interpretar(contexto: Contexto, consola: string[]): null {
-        const simbolo = contexto.obtenerVariable(this.id)
+        const simbolo = contexto.obtenerSimbolo(this.id)
         if(simbolo){
             const valor = simbolo.obtenerValor() as any;
             valor.valor++;

@@ -25,8 +25,14 @@ export class Simbolo {
     public actualizarValor(valor:Object){
         this.valor = valor
     }
+    
+    public obtenertipoDato() {
+        return this.tipo
+    }
 }
 
 export enum tipoSimbolo {
-    VARIABLE
+    VARIABLE,
+    VECTOR, 
+    FUNCION
 }

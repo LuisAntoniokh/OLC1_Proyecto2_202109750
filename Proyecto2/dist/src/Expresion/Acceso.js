@@ -9,7 +9,7 @@ class Acceso extends Expresion_1.Expresion {
         this.id = id;
     }
     interpretar(contexto) {
-        const simbolo = contexto.obtenerVariable(this.id);
+        const simbolo = contexto.obtenerSimbolo(this.id);
         if (simbolo) {
             if (simbolo.tipoSimbolo == Simbolo_1.tipoSimbolo.VARIABLE) {
                 const resultado = simbolo.obtenerValor();

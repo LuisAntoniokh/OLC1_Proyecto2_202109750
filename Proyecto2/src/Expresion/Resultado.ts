@@ -10,7 +10,8 @@ export enum TipoDato{
     BOOLEANO = 2,
     CHAR = 3,
     STRING = 4,
-    NULO,
+    VOID = 5,
+    NULO
 }
 
 export enum OpAritmetica{

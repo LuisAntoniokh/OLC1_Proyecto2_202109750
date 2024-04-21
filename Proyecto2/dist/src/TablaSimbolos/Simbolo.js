@@ -17,9 +17,14 @@ class Simbolo {
     actualizarValor(valor) {
         this.valor = valor;
     }
+    obtenertipoDato() {
+        return this.tipo;
+    }
 }
 exports.Simbolo = Simbolo;
 var tipoSimbolo;
 (function (tipoSimbolo) {
     tipoSimbolo[tipoSimbolo["VARIABLE"] = 0] = "VARIABLE";
+    tipoSimbolo[tipoSimbolo["VECTOR"] = 1] = "VECTOR";
+    tipoSimbolo[tipoSimbolo["FUNCION"] = 2] = "FUNCION";
 })(tipoSimbolo || (exports.tipoSimbolo = tipoSimbolo = {}));

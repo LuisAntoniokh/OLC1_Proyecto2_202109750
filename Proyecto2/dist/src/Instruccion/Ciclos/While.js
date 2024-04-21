@@ -13,15 +13,21 @@ class CWhile extends Instruccion_1.Instruccion {
         let condicion = this.condicion.interpretar(contexto);
         if (condicion.tipo != Resultado_1.TipoDato.BOOLEANO)
             throw new Error("La condicion no es booleana");
-        while (condicion.valor) {
-            // Se ejecutan las instrucciones
-            const retorno = this.instrucciones.interpretar(contexto, consola);
-            if (retorno == "break") {
-                console.log("break");
-                break;
+        try {
+            while (condicion.valor) {
+                // Se ejecutan las instrucciones
+                const retorno = this.instrucciones.interpretar(contexto, consola);
+                if (retorno == "break") {
+                    console.log("break");
+                    break;
+                }
+                // Se calcula la condicion
+                condicion = this.condicion.interpretar(contexto);
             }
-            // Se calcula la condicion
-            condicion = this.condicion.interpretar(contexto);
+        }
+        catch (error) {
+            consola.push(error + "");
+            console.log({ error });
         }
         return null;
     }

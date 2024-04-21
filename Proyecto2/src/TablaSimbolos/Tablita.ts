@@ -20,7 +20,7 @@ export class Contexto {
         throw new Error("La variable ya fue declarada")
     }
 
-    public obtenerVariable(id:string):Simbolo | undefined{
+    public obtenerSimbolo(id:string):Simbolo | undefined{
         let contexto_actual = this as Contexto | null
         while (contexto_actual!=null){
         const existe = contexto_actual.tabla.has(id);
@@ -39,7 +39,7 @@ export class Contexto {
     }
 
     public actualizarTipoSimbolo(id: string, nuevoTipo: TipoDato): void {
-        const simbolo = this.obtenerVariable(id);
+        const simbolo = this.obtenerSimbolo(id);
         if (simbolo) {
             simbolo.tipo = nuevoTipo;
             this.actualizarSimbolo(id, simbolo);
@@ -48,6 +48,14 @@ export class Contexto {
         }
     }
     
+    public obtenerGlobal():Contexto{
+        let contexto = this as Contexto
+        while (contexto.padre!=null){
+            contexto = contexto.padre
+        }
+        return contexto
+    }
+
     /*public guardarVariable(id:string, valor: string, tipo: TipoDato): void {
         const existe = this.tabla.has(id);
         if (!existe) {

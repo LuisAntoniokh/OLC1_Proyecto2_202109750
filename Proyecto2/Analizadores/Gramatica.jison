@@ -7,6 +7,8 @@
     const {OpAritmetica,OpRelacional,OpLogico,TipoDato} = require("../dist/src/Expresion/Resultado");
     const {Print} = require("../dist/src/Instruccion/Print");
     const {Bloque} = require("../dist/src/Instruccion/Bloque");
+    const {Llamada} = require("../dist/src/Instruccion/Llamada");
+    const {Execute} = require("../dist/src/Instruccion/Execute");
     const {FN_IF} = require("../dist/src/Instruccion/Control/IF");
     const {AST} = require("../dist/src/AST");
     const {Simbolo} = require("../dist/src/TablaSimbolos/Simbolo");
@@ -29,6 +31,10 @@
     const {ToLower} = require("../dist/src/Expresion/ToLower");
     const {ToUpper} = require("../dist/src/Expresion/ToUpper");
     const {Round} = require("../dist/src/Expresion/Round");
+    const {DeclaracionVector} = require("../dist/src/Estructura/VecDeclar");
+    const {AsignacionVector} = require("../dist/src/Estructura/VecAssig");
+    const {AccesoVector} = require("../dist/src/Estructura/VerAccess");
+    const {Funcion} = require("../dist/src/Instruccion/Definiciones/Funcion");
 %}
 
 %lex // Inicia parte léxica
@@ -50,6 +56,7 @@
 "BOOL"                  return 'BOOL';
 "CHAR"                  return 'CHAR';
 "STRING"                return 'STRING';
+"VOID"                  return 'TVOID';
 
 // Funciones para imprimir o ejecutar
 "EXECUTE"               return 'EXEC';
@@ -163,8 +170,7 @@ instrucciones: instrucciones instruccion    {  $1.push($2); $$ = $1;}
             | instruccion                   { $$ =  [$1];}
 ;
 
-instruccion: EXEC expresion PYC         { $$ =  $2;}
-            | fn_print PYC              { $$ = $1;}
+instruccion: fn_print PYC              { $$ = $1;}
             | declaracion PYC           { $$ = $1;}
             | fn_if                     { $$ = $1;}
             | fn_switch                 { $$ = $1;}
@@ -175,6 +181,9 @@ instruccion: EXEC expresion PYC         { $$ =  $2;}
             | ciclo_for                 { $$ = $1;}
             | inst_break                { $$ = $1;}
             | CONTINUE PYC              { $$ = new Continue(@1.first_line,@1.first_column);}
+            | fn_funcion                { $$ = $1;}
+            | llamada_funcion PYC       { $$ = $1;}
+            | execute PYC               { $$ = $1;}
 ;
 
 // Para sitetisar un dato, se utiliza $$
@@ -199,11 +208,21 @@ expresion: RES expresion %prec UMINUS   { $$ = new Aritmetica(new Primitivo(0,0,
         | TOLOWER PARIZQ expresion PARDER { $$ = new ToLower($3,@1.first_line,@1.first_column);}
         | TOUPPER PARIZQ expresion PARDER { $$ = new ToUpper($3,@1.first_line,@1.first_column);}
         | ROUND PARIZQ expresion PARDER { $$ = new Round($3,@1.first_line,@1.first_column);}
+        | ID CIZQ lista_valores CDER { $$ = new AccesoVector($1, $3, null, @1.first_line, @1.first_column);}
+        | ID CIZQ lista_valores CDER CIZQ lista_valores CDER { $$ = new AccesoVector($1, $3, $6, @1.first_line, @1.first_column);}
+; 
+
+declaracion: tipos ID ASIGNACION expresion  { $$ = new Declaracion($1, $2, $4, @2.first_line, @2.first_column)}
+           | tipos ID CIZQ CDER ASIGNACION NUEVO tipos CIZQ lista_valores CDER { $$ = new DeclaracionVector($2, [$9], null, $1, @2.first_line, @2.first_column);}
+           | tipos ID CIZQ CDER CIZQ CDER ASIGNACION NUEVO tipos CIZQ lista_valores CDER CIZQ expresion CDER { $$ = new DeclaracionVector($2, [$9, $12], null, $1, @2.first_line, @2.first_column);}
+           | tipos ID CIZQ CDER ASIGNACION CIZQ lista_valores CDER { $$ = new DeclaracionVector($2, [$7.length], $7, $1, @2.first_line, @2.first_column);}
+           | tipos ID CIZQ CDER CIZQ CDER ASIGNACION CIZQ CIZQ lista_valores CDER COMA CIZQ lista_valores CDER CDER { $$ = new DeclaracionVector($2, [$10.length, $14.length], [$10, $14], $1, @2.first_line, @2.first_column);}
 ;
 
-declaracion: tipos ID ASIGNACION expresion  { $$ = new Declaracion($1, $2, $4, @2.first_line, @2.first_column)};
-
-asignacion: ID ASIGNACION expresion         { $$ = new Asignacion($1,$3,@1.first_line,@1.first_column)};
+asignacion: ID ASIGNACION expresion         { $$ = new Asignacion($1,$3,@1.first_line,@1.first_column)}
+          | ID CIZQ expresion CDER ASIGNACION expresion { $$ = new AsignacionVector($1, $3, $6, @1.first_line, @1.first_column);}
+          //| ID CIZQ expresion CDER CIZQ expresion CDER ASIGNACION expresion { $$ = new AsignacionVector($1, $3, $6, $9, @1.first_line, @1.first_column);}
+;
 
 ciclo_while: WHILE PARIZQ expresion PARDER bloque   {$$ = new CWhile($3,$5, @1.first_line, @1.first_column)} ;
 
@@ -227,6 +246,7 @@ tipos: TIPO_INT              { $$ = TipoDato.NUMBER; }
     | BOOL              { $$ = TipoDato.BOOLEANO; }
     | CHAR              { $$ = TipoDato.CHAR; }
     | STD DPS DPS STRING { $$ = TipoDato.STRING; }
+    | TVOID             { $$ = TipoDato.VOID; }
 ;
 
 relacionales
@@ -276,4 +296,31 @@ defaults
 
 casteos
     : PARIZQ tipos PARDER expresion %prec 'PARDER' { $$ = new Casteo($2.valor, $4, @1.first_line, @1.first_column); }
+;
+
+lista_valores: lista_valores COMA expresion { $1.push($3); $$ = $1;}
+             | expresion { $$ = [$1];}
+;
+
+fn_funcion
+        : tipos ID PARIZQ PARDER bloque                         {$$ = new Funcion($1,$2,[],$5,@1.first_line,@1.first_column)}
+        | tipos ID PARIZQ lista_parametros PARDER bloque        {$$ = new Funcion($1,$2,$4,$6,@1.first_line,@1.first_column)}
+;
+parametro
+        : tipos ID                              {$$ = ({id:$2,tipo:$1}); }
+;
+lista_parametros
+        : lista_parametros COMA parametro            {$1.push($3); $$ = $1;}
+        | parametro                             {$$ = [$1];}
+;
+llamada_funcion
+        : ID PARIZQ PARDER                      {$$ = new Llamada($1,[],@1.first_line,@1.first_column)}
+        | ID PARIZQ lista_expresiones PARDER    {$$ = new Llamada($1,$3,@1.first_line,@1.first_column)}
+;
+lista_expresiones
+        : lista_expresiones COMA expresion       {$1.push($3); $$ = $1;}
+        | expresion                             {$$ = [$1];}
+;
+execute
+        : EXEC llamada_funcion                  {$$ = new Execute($2,@1.first_line,@1.first_column)}
 ;

@@ -10,10 +10,12 @@ class Asignacion extends Instruccion_1.Instruccion {
         this.expresion = expresion;
     }
     interpretar(contexto, consola) {
-        const simbolo = contexto.obtenerVariable(this.id);
+        const simbolo = contexto.obtenerSimbolo(this.id);
         if (simbolo) {
             if (simbolo.tipoSimbolo == Simbolo_1.tipoSimbolo.VARIABLE) {
                 const nuevoValor = this.expresion.interpretar(contexto);
+                if (nuevoValor.tipo != simbolo.obtenertipoDato())
+                    throw new Error("Tipo de asignación no válida");
                 simbolo.actualizarValor(nuevoValor);
                 contexto.actualizarSimbolo(this.id, simbolo);
                 return null;

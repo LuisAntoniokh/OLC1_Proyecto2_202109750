@@ -16,17 +16,21 @@ export class CWhile extends Instruccion{
     public interpretar(contexto: Contexto, consola: string[]): null {
         let condicion = this.condicion.interpretar(contexto)    
         if (condicion.tipo != TipoDato.BOOLEANO) throw new Error("La condicion no es booleana")
-        while(condicion.valor){
+        try{
+            while(condicion.valor){
             // Se ejecutan las instrucciones
-             const retorno = this.instrucciones.interpretar(contexto,consola)
-             if (retorno=="break"){
-                console.log("break")
-                break;
-             }
-            // Se calcula la condicion
-            condicion = this.condicion.interpretar(contexto)
-        }
+                const retorno = this.instrucciones.interpretar(contexto,consola)
+                if (retorno=="break"){
+                    console.log("break")
+                    break;
+                }
+                // Se calcula la condicion
+                condicion = this.condicion.interpretar(contexto)
+            } 
+        } catch (error) {
+            consola.push(error+"")
+            console.log({error}) 
+        }   
         return null
     }
-
 }

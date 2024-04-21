@@ -16,7 +16,7 @@ class Contexto {
         }
         throw new Error("La variable ya fue declarada");
     }
-    obtenerVariable(id) {
+    obtenerSimbolo(id) {
         let contexto_actual = this;
         while (contexto_actual != null) {
             const existe = contexto_actual.tabla.has(id);
@@ -33,7 +33,7 @@ class Contexto {
         this.tabla.set(id, valor);
     }
     actualizarTipoSimbolo(id, nuevoTipo) {
-        const simbolo = this.obtenerVariable(id);
+        const simbolo = this.obtenerSimbolo(id);
         if (simbolo) {
             simbolo.tipo = nuevoTipo;
             this.actualizarSimbolo(id, simbolo);
@@ -41,6 +41,13 @@ class Contexto {
         else {
             throw new Error(`La variable ${id} no existe en el contexto actual`);
         }
+    }
+    obtenerGlobal() {
+        let contexto = this;
+        while (contexto.padre != null) {
+            contexto = contexto.padre;
+        }
+        return contexto;
     }
 }
 exports.Contexto = Contexto;

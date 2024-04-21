@@ -8,7 +8,7 @@ class Decremento extends Instruccion_1.Instruccion {
         this.id = id;
     }
     interpretar(contexto, consola) {
-        const simbolo = contexto.obtenerVariable(this.id);
+        const simbolo = contexto.obtenerSimbolo(this.id);
         if (simbolo) {
             const valor = simbolo.obtenerValor();
             valor.valor--;
