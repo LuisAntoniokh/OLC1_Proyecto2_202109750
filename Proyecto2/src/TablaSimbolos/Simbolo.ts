@@ -34,5 +34,6 @@ export class Simbolo {
 export enum tipoSimbolo {
     VARIABLE,
     VECTOR, 
-    FUNCION
+    FUNCION,
+    METODO
 }

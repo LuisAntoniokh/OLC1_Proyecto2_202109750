@@ -35,6 +35,8 @@
     const {AsignacionVector} = require("../dist/src/Estructura/VecAssig");
     const {AccesoVector} = require("../dist/src/Estructura/VerAccess");
     const {Funcion} = require("../dist/src/Instruccion/Definiciones/Funcion");
+    const {Metodos} = require("../dist/src/Instruccion/Definiciones/Metodos");
+    const {Return} = require("../dist/src/Instruccion/Control/Return");
 %}
 
 %lex // Inicia parte léxica
@@ -184,6 +186,8 @@ instruccion: fn_print PYC              { $$ = $1;}
             | fn_funcion                { $$ = $1;}
             | llamada_funcion PYC       { $$ = $1;}
             | execute PYC               { $$ = $1;}
+                | instr_return              { $$ = $1;}
+                | fn_metodo             { $$ = $1;}
 ;
 
 // Para sitetisar un dato, se utiliza $$
@@ -208,15 +212,17 @@ expresion: RES expresion %prec UMINUS   { $$ = new Aritmetica(new Primitivo(0,0,
         | TOLOWER PARIZQ expresion PARDER { $$ = new ToLower($3,@1.first_line,@1.first_column);}
         | TOUPPER PARIZQ expresion PARDER { $$ = new ToUpper($3,@1.first_line,@1.first_column);}
         | ROUND PARIZQ expresion PARDER { $$ = new Round($3,@1.first_line,@1.first_column);}
-        | ID CIZQ lista_valores CDER { $$ = new AccesoVector($1, $3, null, @1.first_line, @1.first_column);}
-        | ID CIZQ lista_valores CDER CIZQ lista_valores CDER { $$ = new AccesoVector($1, $3, $6, @1.first_line, @1.first_column);}
+        | ID CIZQ lista_expresiones CDER { $$ = new AccesoVector($1, $3, null, @1.first_line, @1.first_column);}
+        | ID CIZQ lista_expresiones CDER CIZQ lista_expresiones CDER { $$ = new AccesoVector($1, $3, $6, @1.first_line, @1.first_column);}
+        | llamada_funcion              { $$ = $1;}
+
 ; 
 
 declaracion: tipos ID ASIGNACION expresion  { $$ = new Declaracion($1, $2, $4, @2.first_line, @2.first_column)}
-           | tipos ID CIZQ CDER ASIGNACION NUEVO tipos CIZQ lista_valores CDER { $$ = new DeclaracionVector($2, [$9], null, $1, @2.first_line, @2.first_column);}
-           | tipos ID CIZQ CDER CIZQ CDER ASIGNACION NUEVO tipos CIZQ lista_valores CDER CIZQ expresion CDER { $$ = new DeclaracionVector($2, [$9, $12], null, $1, @2.first_line, @2.first_column);}
-           | tipos ID CIZQ CDER ASIGNACION CIZQ lista_valores CDER { $$ = new DeclaracionVector($2, [$7.length], $7, $1, @2.first_line, @2.first_column);}
-           | tipos ID CIZQ CDER CIZQ CDER ASIGNACION CIZQ CIZQ lista_valores CDER COMA CIZQ lista_valores CDER CDER { $$ = new DeclaracionVector($2, [$10.length, $14.length], [$10, $14], $1, @2.first_line, @2.first_column);}
+           | tipos ID CIZQ CDER ASIGNACION NUEVO tipos CIZQ lista_expresiones CDER { $$ = new DeclaracionVector($2, [$9], null, $1, @2.first_line, @2.first_column);}
+           | tipos ID CIZQ CDER CIZQ CDER ASIGNACION NUEVO tipos CIZQ lista_expresiones CDER CIZQ expresion CDER { $$ = new DeclaracionVector($2, [$9, $12], null, $1, @2.first_line, @2.first_column);}
+           | tipos ID CIZQ CDER ASIGNACION CIZQ lista_expresiones CDER { $$ = new DeclaracionVector($2, [$7.length], $7, $1, @2.first_line, @2.first_column);}
+           | tipos ID CIZQ CDER CIZQ CDER ASIGNACION CIZQ CIZQ lista_expresiones CDER COMA CIZQ lista_expresiones CDER CDER { $$ = new DeclaracionVector($2, [$10.length, $14.length], [$10, $14], $1, @2.first_line, @2.first_column);}
 ;
 
 asignacion: ID ASIGNACION expresion         { $$ = new Asignacion($1,$3,@1.first_line,@1.first_column)}
@@ -246,7 +252,6 @@ tipos: TIPO_INT              { $$ = TipoDato.NUMBER; }
     | BOOL              { $$ = TipoDato.BOOLEANO; }
     | CHAR              { $$ = TipoDato.CHAR; }
     | STD DPS DPS STRING { $$ = TipoDato.STRING; }
-    | TVOID             { $$ = TipoDato.VOID; }
 ;
 
 relacionales
@@ -298,29 +303,39 @@ casteos
     : PARIZQ tipos PARDER expresion %prec 'PARDER' { $$ = new Casteo($2.valor, $4, @1.first_line, @1.first_column); }
 ;
 
-lista_valores: lista_valores COMA expresion { $1.push($3); $$ = $1;}
-             | expresion { $$ = [$1];}
+fn_funcion
+        : TVOID ID PARIZQ PARDER bloque                         {$$ = new Funcion(TipoDato.VOID,$2,[],$5,@1.first_line,@1.first_column)}
+        | TVOID ID PARIZQ lista_parametros PARDER bloque        {$$ = new Funcion(TipoDato.VOID,$2,$4,$6,@1.first_line,@1.first_column)}
 ;
 
-fn_funcion
-        : tipos ID PARIZQ PARDER bloque                         {$$ = new Funcion($1,$2,[],$5,@1.first_line,@1.first_column)}
-        | tipos ID PARIZQ lista_parametros PARDER bloque        {$$ = new Funcion($1,$2,$4,$6,@1.first_line,@1.first_column)}
+fn_metodo
+        : tipos ID PARIZQ PARDER bloque                         {$$ = new Metodos($1,$2,[],$5,@1.first_line,@1.first_column)}
+        | tipos ID PARIZQ lista_parametros PARDER bloque        {$$ = new Metodos($1,$2,$4,$6,@1.first_line,@1.first_column)}
 ;
-parametro
-        : tipos ID                              {$$ = ({id:$2,tipo:$1}); }
-;
+
 lista_parametros
         : lista_parametros COMA parametro            {$1.push($3); $$ = $1;}
         | parametro                             {$$ = [$1];}
 ;
+
+parametro
+        : tipos ID                              {$$ = ({id:$2,tipo:$1}); }
+;
+
 llamada_funcion
         : ID PARIZQ PARDER                      {$$ = new Llamada($1,[],@1.first_line,@1.first_column)}
         | ID PARIZQ lista_expresiones PARDER    {$$ = new Llamada($1,$3,@1.first_line,@1.first_column)}
 ;
+
 lista_expresiones
         : lista_expresiones COMA expresion       {$1.push($3); $$ = $1;}
         | expresion                             {$$ = [$1];}
 ;
+
 execute
         : EXEC llamada_funcion                  {$$ = new Execute($2,@1.first_line,@1.first_column)}
+;
+
+instr_return: RETURN expresion PYC {$$ = new Return($2,@1.first_line,@1.first_column);}
+        | RETURN PYC {$$ = new Return(null,@1.first_line,@1.first_column);}
 ;

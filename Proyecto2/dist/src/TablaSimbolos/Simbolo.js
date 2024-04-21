@@ -27,4 +27,5 @@ var tipoSimbolo;
     tipoSimbolo[tipoSimbolo["VARIABLE"] = 0] = "VARIABLE";
     tipoSimbolo[tipoSimbolo["VECTOR"] = 1] = "VECTOR";
     tipoSimbolo[tipoSimbolo["FUNCION"] = 2] = "FUNCION";
+    tipoSimbolo[tipoSimbolo["METODO"] = 3] = "METODO";
 })(tipoSimbolo || (exports.tipoSimbolo = tipoSimbolo = {}));

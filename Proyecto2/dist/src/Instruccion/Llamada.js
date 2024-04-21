@@ -18,7 +18,7 @@ class Llamada extends Instruccion_1.Instruccion {
         // Comparar parámetros - cantidad y tipo
         const funcion = simbolo.obtenerValor();
         const global = contexto.obtenerGlobal();
-        const contextoFuncion = new Tablita_1.Contexto(global);
+        const contextoFuncion = new Tablita_1.Contexto(global); // Aquí pasamos el contexto global
         if (this.argumentos.length != funcion.getParametros().length)
             throw new Error("Verifique la cantidad de argumentos");
         funcion.getParametros().forEach((parametro, index) => {
