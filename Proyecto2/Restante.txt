@@ -10,13 +10,9 @@ Secuencias de escape(?)
 
 // Dios plan que va a salir:
 
-Vectores (Todo).
+Vectores (2D).
 
-Return.
-
-Funciones, metodos y llamadas.
-
-Length, typeOf, toString, c_str.
+typeOf, toString y c_str.
 
 Reportes y manuales.
 

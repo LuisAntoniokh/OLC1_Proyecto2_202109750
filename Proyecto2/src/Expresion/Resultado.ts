@@ -11,6 +11,7 @@ export enum TipoDato{
     CHAR = 3,
     STRING = 4,
     VOID = 5,
+    VECTOR = 6,
     NULO
 }
 

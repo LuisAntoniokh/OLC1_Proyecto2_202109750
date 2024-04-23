@@ -9,7 +9,8 @@ var TipoDato;
     TipoDato[TipoDato["CHAR"] = 3] = "CHAR";
     TipoDato[TipoDato["STRING"] = 4] = "STRING";
     TipoDato[TipoDato["VOID"] = 5] = "VOID";
-    TipoDato[TipoDato["NULO"] = 6] = "NULO";
+    TipoDato[TipoDato["VECTOR"] = 6] = "VECTOR";
+    TipoDato[TipoDato["NULO"] = 7] = "NULO";
 })(TipoDato || (exports.TipoDato = TipoDato = {}));
 var OpAritmetica;
 (function (OpAritmetica) {

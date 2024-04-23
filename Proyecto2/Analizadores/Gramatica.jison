@@ -37,6 +37,7 @@
     const {Funcion} = require("../dist/src/Instruccion/Definiciones/Funcion");
     const {Metodos} = require("../dist/src/Instruccion/Definiciones/Metodos");
     const {Return} = require("../dist/src/Instruccion/Control/Return");
+    const {Length} = require("../dist/src/Expresion/Length");
 %}
 
 %lex // Inicia parte léxica
@@ -135,6 +136,12 @@
 '?'                     return 'QMARK';
 ':'                     return 'DPS';
 
+"\\n"                   return 'SALTITO';
+"\\\\"                  return 'BACKSLASH';
+"\\\""                  return 'DOUBLE_QUOTE';
+"\\t"                   return 'TAB';
+"\\'"                   return 'SINGLE_QUOTE';
+
 ([a-zA-z])[a-zA-Z0-9_]* return 'ID';
 
 // Cadenas             "asdfasdfasf"
@@ -159,6 +166,7 @@
 %left QMARK DPS
 %nonassoc CAST
 %nonassoc 'PARDER' 
+%left 'PUNTO'
 // Inicio de gramática
 %start ini
 
@@ -214,6 +222,7 @@ expresion: RES expresion %prec UMINUS   { $$ = new Aritmetica(new Primitivo(0,0,
         | ID CIZQ lista_expresiones CDER { $$ = new AccesoVector($1, $3, null, @1.first_line, @1.first_column);}
         | ID CIZQ lista_expresiones CDER CIZQ lista_expresiones CDER { $$ = new AccesoVector($1, $3, $6, @1.first_line, @1.first_column);}
         | llamada_funcion              { $$ = $1;}
+        | ID PUNTO LENGTH PARIZQ PARDER { $$ = new Length($1, @1.first_line, @1.first_column);}
 ; 
 
 declaracion: tipos ID ASIGNACION expresion  { $$ = new Declaracion($1, $2, $4, @2.first_line, @2.first_column)}
