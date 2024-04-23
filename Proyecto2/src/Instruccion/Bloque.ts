@@ -1,5 +1,6 @@
 import { Instruccion } from "./Instruccion";
 import { Contexto } from "../TablaSimbolos/Tablita";
+import { Return } from "./Control/Return";
 
 export class Bloque extends Instruccion{
     instrucciones: Instruccion[]
@@ -9,12 +10,12 @@ export class Bloque extends Instruccion{
         this.instrucciones = instrucciones
     }
 
-    public interpretar(contexto:Contexto,consola: string[]): null | string {
+    public interpretar(contexto:Contexto,consola: string[]): any {
         const nuevoContexto = new Contexto(contexto)
+        let retorno: any = null;
         for (const instruccion of this.instrucciones) {
-            const retorno = instruccion.interpretar(nuevoContexto,consola)
-            console.log({retorno})
-            if(retorno)  return retorno
+            retorno = instruccion.interpretar(nuevoContexto,consola)
+            if(retorno !== null && retorno !== undefined) return retorno
         } 
         return null;
     }

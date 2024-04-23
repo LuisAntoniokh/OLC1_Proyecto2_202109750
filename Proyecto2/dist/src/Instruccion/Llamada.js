@@ -23,15 +23,18 @@ class Llamada extends Instruccion_1.Instruccion {
             throw new Error("Verifique la cantidad de argumentos");
         funcion.getParametros().forEach((parametro, index) => {
             const exp = this.argumentos[index].interpretar(contexto);
-            if (exp.tipo != parametro.tipo)
-                throw new Error("Tipo de parámetro no coincide");
+            if (exp === null) {
+                throw new Error("La interpretación del argumento es null EN LLAMADA");
+            }
+            console.log(`Argumento: ${exp.valor}, tipo: ${exp.tipo}; Parámetro esperado: ${parametro.id}, tipo: ${parametro.tipo}`);
             // Declarar variable                
             contextoFuncion.guardarSimbolo(parametro.id, exp, exp.tipo, 0, 0, Simbolo_1.tipoSimbolo.VARIABLE);
         });
         // Ejecutar lista de instrucciones
         const instrucciones = funcion.getInstrucciones();
-        instrucciones.interpretar(contextoFuncion, consola);
-        return null;
+        const resultado = instrucciones.interpretar(contextoFuncion, consola);
+        // No devolvemos el resultado aquí
+        return resultado;
     }
 }
 exports.Llamada = Llamada;

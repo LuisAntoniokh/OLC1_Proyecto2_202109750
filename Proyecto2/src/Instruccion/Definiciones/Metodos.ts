@@ -23,11 +23,13 @@ export class Metodos extends Instruccion{
 
     public interpretar(contexto: Contexto, consola: string[]): any {
         const global = contexto.obtenerGlobal()
-        global.guardarSimbolo(this.id,this,this.tipo,0,0,tipoSimbolo.METODO)
-        this.retorno = this.bloque.interpretar(contexto, consola)
+        global.guardarSimbolo(this.id,this,this.tipo,0,0,tipoSimbolo.FUNCION)
+        const nuevoContexto = new Contexto(contexto)
+        this.retorno = this.bloque.interpretar(nuevoContexto, consola)
         if (this.retorno === null || this.retorno === undefined) {
             throw new Error("Function must return a value")
         }
+        console.log(this.retorno)
         return this.retorno
     }
 

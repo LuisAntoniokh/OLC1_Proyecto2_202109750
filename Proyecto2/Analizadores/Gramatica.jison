@@ -172,7 +172,7 @@ instrucciones: instrucciones instruccion    {  $1.push($2); $$ = $1;}
             | instruccion                   { $$ =  [$1];}
 ;
 
-instruccion: fn_print PYC              { $$ = $1;}
+instruccion: fn_print PYC               { $$ = $1;}
             | declaracion PYC           { $$ = $1;}
             | fn_if                     { $$ = $1;}
             | fn_switch                 { $$ = $1;}
@@ -186,8 +186,7 @@ instruccion: fn_print PYC              { $$ = $1;}
             | fn_funcion                { $$ = $1;}
             | llamada_funcion PYC       { $$ = $1;}
             | execute PYC               { $$ = $1;}
-                | instr_return              { $$ = $1;}
-                | fn_metodo             { $$ = $1;}
+            | instr_return              { $$ = $1;}
 ;
 
 // Para sitetisar un dato, se utiliza $$
@@ -215,7 +214,6 @@ expresion: RES expresion %prec UMINUS   { $$ = new Aritmetica(new Primitivo(0,0,
         | ID CIZQ lista_expresiones CDER { $$ = new AccesoVector($1, $3, null, @1.first_line, @1.first_column);}
         | ID CIZQ lista_expresiones CDER CIZQ lista_expresiones CDER { $$ = new AccesoVector($1, $3, $6, @1.first_line, @1.first_column);}
         | llamada_funcion              { $$ = $1;}
-
 ; 
 
 declaracion: tipos ID ASIGNACION expresion  { $$ = new Declaracion($1, $2, $4, @2.first_line, @2.first_column)}
@@ -252,6 +250,7 @@ tipos: TIPO_INT              { $$ = TipoDato.NUMBER; }
     | BOOL              { $$ = TipoDato.BOOLEANO; }
     | CHAR              { $$ = TipoDato.CHAR; }
     | STD DPS DPS STRING { $$ = TipoDato.STRING; }
+    | TVOID             { $$ = TipoDato.VOID; }
 ;
 
 relacionales
@@ -304,13 +303,8 @@ casteos
 ;
 
 fn_funcion
-        : TVOID ID PARIZQ PARDER bloque                         {$$ = new Funcion(TipoDato.VOID,$2,[],$5,@1.first_line,@1.first_column)}
-        | TVOID ID PARIZQ lista_parametros PARDER bloque        {$$ = new Funcion(TipoDato.VOID,$2,$4,$6,@1.first_line,@1.first_column)}
-;
-
-fn_metodo
-        : tipos ID PARIZQ PARDER bloque                         {$$ = new Metodos($1,$2,[],$5,@1.first_line,@1.first_column)}
-        | tipos ID PARIZQ lista_parametros PARDER bloque        {$$ = new Metodos($1,$2,$4,$6,@1.first_line,@1.first_column)}
+        : tipos ID PARIZQ PARDER bloque                         {$$ = new Funcion($1,$2,[],$5,@1.first_line,@1.first_column)}
+        | tipos ID PARIZQ lista_parametros PARDER bloque        {$$ = new Funcion($1,$2,$4,$6,@1.first_line,@1.first_column)}
 ;
 
 lista_parametros
@@ -337,5 +331,5 @@ execute
 ;
 
 instr_return: RETURN expresion PYC {$$ = new Return($2,@1.first_line,@1.first_column);}
-        | RETURN PYC {$$ = new Return(null,@1.first_line,@1.first_column);}
+        | RETURN PYC {$$ = new Break(@1.first_line,@1.first_column);}
 ;

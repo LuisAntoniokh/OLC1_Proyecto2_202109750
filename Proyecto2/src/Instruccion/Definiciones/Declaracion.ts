@@ -19,6 +19,9 @@ export class Declaracion extends Instruccion{
     public interpretar(contexto:Contexto,consola: string[]): null {
        // Existe?
         const valor = this.expresion.interpretar(contexto)
+        if (valor === null || valor === undefined) {
+            throw new Error("La interpretación de la expresión es null o undefined EN DECLARACION");
+        }
         contexto.guardarSimbolo(this.id,valor,valor.tipo, this.line, this.column, tipoSimbolo.VARIABLE)
         return null
     }

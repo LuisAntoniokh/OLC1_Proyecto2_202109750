@@ -11,11 +11,14 @@ export class Return extends Instruccion{
     }
 
     public interpretar(contexto: Contexto, consola: string[]): any {
-        if (this.expresion === null) {
-            return "return";
-        } else {
-            const valor = this.expresion.interpretar(contexto);
-            return valor;
+        const val = this.expresion?.interpretar(contexto); // Add null check using '?'
+        console.log(`Valor después de interpretar: ${val?.valor} en retorno`);
+        if (val === null || val === undefined) {
+            throw new Error("La interpretación de la expresión es null o undefined");
         }
+        if (val.valor === undefined) {
+            throw new Error("El valor de la interpretación es undefined");
+        }
+        return { valor: val.valor, tipo: val.tipo };
     }
 }

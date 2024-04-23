@@ -13,6 +13,9 @@ class Declaracion extends Instruccion_1.Instruccion {
     interpretar(contexto, consola) {
         // Existe?
         const valor = this.expresion.interpretar(contexto);
+        if (valor === null || valor === undefined) {
+            throw new Error("La interpretación de la expresión es null o undefined EN DECLARACION");
+        }
         contexto.guardarSimbolo(this.id, valor, valor.tipo, this.line, this.column, Simbolo_1.tipoSimbolo.VARIABLE);
         return null;
     }

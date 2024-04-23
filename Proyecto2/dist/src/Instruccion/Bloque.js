@@ -10,10 +10,10 @@ class Bloque extends Instruccion_1.Instruccion {
     }
     interpretar(contexto, consola) {
         const nuevoContexto = new Tablita_1.Contexto(contexto);
+        let retorno = null;
         for (const instruccion of this.instrucciones) {
-            const retorno = instruccion.interpretar(nuevoContexto, consola);
-            console.log({ retorno });
-            if (retorno)
+            retorno = instruccion.interpretar(nuevoContexto, consola);
+            if (retorno !== null && retorno !== undefined)
                 return retorno;
         }
         return null;
