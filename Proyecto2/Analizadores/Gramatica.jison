@@ -38,6 +38,23 @@
     const {Metodos} = require("../dist/src/Instruccion/Definiciones/Metodos");
     const {Return} = require("../dist/src/Instruccion/Control/Return");
     const {Length} = require("../dist/src/Expresion/Length");
+    const {Typeof} = require("../dist/src/Expresion/Typeof");
+    getDefaultValue = (tipo) => {
+        switch(tipo){
+            case TipoDato.NUMBER:
+                return 0;
+            case TipoDato.DOUBLE:
+                return 0.0;
+            case TipoDato.BOOLEANO:
+                return "true";
+            case TipoDato.CHAR:
+                return '\u0000';
+            case TipoDato.STRING:
+                return "";
+            default:
+                return null;
+        }
+    }
 %}
 
 %lex // Inicia parte léxica
@@ -223,14 +240,19 @@ expresion: RES expresion %prec UMINUS   { $$ = new Aritmetica(new Primitivo(0,0,
         | ID CIZQ lista_expresiones CDER CIZQ lista_expresiones CDER { $$ = new AccesoVector($1, $3, $6, @1.first_line, @1.first_column);}
         | llamada_funcion              { $$ = $1;}
         | ID PUNTO LENGTH PARIZQ PARDER { $$ = new Length($1, @1.first_line, @1.first_column);}
+        | TYPEOF PARIZQ expresion PARDER { $$ = new Typeof($3, @1.first_line, @1.first_column);}
 ; 
 
-declaracion: tipos ID ASIGNACION expresion  { $$ = new Declaracion($1, $2, $4, @2.first_line, @2.first_column)}
+declaracion: tipos lista_ids ASIGNACION expresion  { $$ = new Declaracion($1, $2, $4, @2.first_line, @2.first_column)}
+           | tipos lista_ids { $$ = new Declaracion($1, $2, new Primitivo(getDefaultValue($1), $1, 0, 0), @2.first_line, @2.first_column)}
            | tipos ID CIZQ CDER ASIGNACION NUEVO tipos CIZQ lista_expresiones CDER { $$ = new DeclaracionVector($2, [$9], null, $1, @2.first_line, @2.first_column);}
            | tipos ID CIZQ CDER CIZQ CDER ASIGNACION NUEVO tipos CIZQ lista_expresiones CDER CIZQ expresion CDER { $$ = new DeclaracionVector($2, [$9, $12], null, $1, @2.first_line, @2.first_column);}
            | tipos ID CIZQ CDER ASIGNACION CIZQ lista_expresiones CDER { $$ = new DeclaracionVector($2, [$7.length], $7, $1, @2.first_line, @2.first_column);}
            | tipos ID CIZQ CDER CIZQ CDER ASIGNACION CIZQ CIZQ lista_expresiones CDER COMA CIZQ lista_expresiones CDER CDER { $$ = new DeclaracionVector($2, [$10.length, $14.length], [$10, $14], $1, @2.first_line, @2.first_column);}
 ;
+
+lista_ids: lista_ids COMA ID { $1.push($3); $$ = $1; }
+        | ID { $$ = [$1]; };
 
 asignacion: ID ASIGNACION expresion         { $$ = new Asignacion($1,$3,@1.first_line,@1.first_column)}
           | ID CIZQ expresion CDER ASIGNACION expresion { $$ = new AsignacionVector($1, $3, $6, @1.first_line, @1.first_column);}
@@ -323,6 +345,7 @@ lista_parametros
 
 parametro
         : tipos ID                              {$$ = ({id:$2,tipo:$1}); }
+        | tipos ID CIZQ CDER                    {$$ = ({id:$2,tipo:$1}); }
 ;
 
 llamada_funcion

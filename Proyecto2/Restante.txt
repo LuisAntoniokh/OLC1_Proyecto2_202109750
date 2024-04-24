@@ -1,19 +1,14 @@
 // Probe y no xd.
-
 Comentarios.
 Ternario.
-Creacion de varios ID con valores default.
 Casteos.
 
 // Ni idea.
 Secuencias de escape(?)
 
 // Dios plan que va a salir:
-
 Vectores (2D).
-
-typeOf, toString y c_str.
-
+toString y c_str.
 Reportes y manuales.
 
 

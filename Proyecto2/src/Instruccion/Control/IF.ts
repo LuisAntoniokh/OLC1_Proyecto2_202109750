@@ -19,24 +19,18 @@ export class FN_IF extends Instruccion{
     public interpretar(contexto:Contexto,consola: string[]): null | string {
         const condicion = this.condicion.interpretar(contexto)
         if (condicion.tipo!=TipoDato.BOOLEANO)
-            throw Error("La condicion no es booleana")
+            throw Error("La condición no es booleana")
         if (condicion.valor){
-            if (this.bloqueIf === null || this.bloqueIf === undefined) {
-                throw new Error("El bloque 'if' es null o undefined");
-            }
             const retorno =  this.bloqueIf.interpretar(contexto,consola)
-            console.log("retorno en if" + retorno.valor)
+            console.log(retorno)
             if (retorno) return retorno
-        } else {
+        }else{
             console.log("else")
             console.log({else:this.bloqueElse})
-            if (this.bloqueElse === null || this.bloqueElse === undefined) {
-                throw new Error("El bloque 'else' es null o undefined");
-            }
             const retorno = this.bloqueElse?.interpretar(contexto,consola)
-            console.log("retorno en else" + retorno.valor)
             if (retorno) return retorno
         }
         return null
     }
+
 }

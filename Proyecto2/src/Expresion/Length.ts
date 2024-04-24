@@ -13,7 +13,7 @@ export class Length extends Expresion{
 
     public interpretar(contexto: Contexto): Resultado {
         const resultado = contexto.obtenerSimbolo(this.id);
-        if (resultado?.tipo === TipoDato.STRING || resultado?.tipo === TipoDato.VECTOR) {
+        if (resultado?.tipo === TipoDato.STRING || Array.isArray(resultado?.tipo)) {
             const valorObjeto = resultado.obtenerValor();
             if ('valor' in valorObjeto) {
                 const valor = valorObjeto.valor;

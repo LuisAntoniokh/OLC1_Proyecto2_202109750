@@ -5,25 +5,41 @@ import { TipoDato } from "../../Expresion/Resultado";
 import { Instruccion } from "../Instruccion";
 
 export class Declaracion extends Instruccion{
-    tipo:TipoDato
-    id:string
-    expresion:Expresion
+    tipo: TipoDato;
+    ids: string[];
+    expresion: Expresion | null;
 
-    constructor(tipo:TipoDato,id:string,expresion:Expresion,linea:number,columna:number){
-        super(linea,columna)
-        this.tipo = tipo
-        this.id = id
-        this.expresion = expresion
+    constructor(tipo: TipoDato, ids: string[], expresion: Expresion | null, linea: number, columna: number) {
+        super(linea, columna);
+        this.tipo = tipo;
+        this.ids = ids;
+        this.expresion = expresion;
     }
 
     public interpretar(contexto:Contexto,consola: string[]): null {
        // Existe?
-        const valor = this.expresion.interpretar(contexto)
-        if (valor === null || valor === undefined) {
-            throw new Error("La interpretación de la expresión es null o undefined EN DECLARACION");
-        }
-        contexto.guardarSimbolo(this.id,valor,valor.tipo, this.line, this.column, tipoSimbolo.VARIABLE)
-        return null
+       const valor = this.expresion ? this.expresion.interpretar(contexto) : this.getDefaultValue(this.tipo);
+       for (const id of this.ids) {
+           contexto.guardarSimbolo(id, valor, this.tipo, 0, 0, tipoSimbolo.VARIABLE);
+       }
+       return null;
     }
 
+    private getDefaultValue(tipo: TipoDato): any {
+        switch (tipo) {
+            case TipoDato.NUMBER:
+                return 0;
+            case TipoDato.DOUBLE:
+                return 0.0;
+            case TipoDato.BOOLEANO:
+                return "true";
+            case TipoDato.CHAR:
+                return '\u0000';
+            case TipoDato.STRING:
+                return "";
+            default:
+                return null;
+                
+        }
+    }
 }

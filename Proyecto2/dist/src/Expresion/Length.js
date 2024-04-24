@@ -10,7 +10,7 @@ class Length extends Expresion_1.Expresion {
     }
     interpretar(contexto) {
         const resultado = contexto.obtenerSimbolo(this.id);
-        if ((resultado === null || resultado === void 0 ? void 0 : resultado.tipo) === Resultado_1.TipoDato.STRING || (resultado === null || resultado === void 0 ? void 0 : resultado.tipo) === Resultado_1.TipoDato.VECTOR) {
+        if ((resultado === null || resultado === void 0 ? void 0 : resultado.tipo) === Resultado_1.TipoDato.STRING || Array.isArray(resultado === null || resultado === void 0 ? void 0 : resultado.tipo)) {
             const valorObjeto = resultado.obtenerValor();
             if ('valor' in valorObjeto) {
                 const valor = valorObjeto.valor;
