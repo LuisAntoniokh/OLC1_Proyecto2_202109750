@@ -39,6 +39,7 @@
     const {Return} = require("../dist/src/Instruccion/Control/Return");
     const {Length} = require("../dist/src/Expresion/Length");
     const {Typeof} = require("../dist/src/Expresion/Typeof");
+    const {ToString} = require("../dist/src/Expresion/ToString");
     getDefaultValue = (tipo) => {
         switch(tipo){
             case TipoDato.NUMBER:
@@ -241,6 +242,7 @@ expresion: RES expresion %prec UMINUS   { $$ = new Aritmetica(new Primitivo(0,0,
         | llamada_funcion              { $$ = $1;}
         | ID PUNTO LENGTH PARIZQ PARDER { $$ = new Length($1, @1.first_line, @1.first_column);}
         | TYPEOF PARIZQ expresion PARDER { $$ = new Typeof($3, @1.first_line, @1.first_column);}
+        | STD DPS DPS TOSTRING PARIZQ expresion PARDER { $$ = new ToString($6, @1.first_line, @1.first_column);}
 ; 
 
 declaracion: tipos lista_ids ASIGNACION expresion  { $$ = new Declaracion($1, $2, $4, @2.first_line, @2.first_column)}

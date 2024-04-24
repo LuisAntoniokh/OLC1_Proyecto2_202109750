@@ -8,7 +8,7 @@ Secuencias de escape(?)
 
 // Dios plan que va a salir:
 Vectores (2D).
-toString y c_str.
+c_str.
 Reportes y manuales.
 
 
