@@ -30,7 +30,7 @@ function App() {
 
   return (
     <>
-      <h1>Interfaz</h1>
+      <h1>CompiScript+ by: 202109750</h1>
       <button onClick={handleCreateFile}>Crear Archivo</button>
       <input
         type="file"
