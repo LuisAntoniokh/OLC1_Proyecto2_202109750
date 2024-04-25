@@ -56,6 +56,20 @@ export class Contexto {
         return contexto
     }
 
+    public obtenerTabla(): { id: string, tipo: string, valor: any, fila: number, columna: number }[] {
+            let tabla: { id: string, tipo: string, valor: any, fila: number, columna: number }[] = [];
+            this.tabla.forEach((valor, clave) => {
+                tabla.push({
+                    id: clave,
+                    tipo: typeof valor.obtenerValor,
+                    valor: valor.valor,
+                    fila: valor.fila,
+                    columna: valor.columna,
+                });
+            });
+            return tabla;
+        }
+    
     /*public guardarVariable(id:string, valor: string, tipo: TipoDato): void {
         const existe = this.tabla.has(id);
         if (!existe) {

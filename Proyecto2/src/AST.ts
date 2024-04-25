@@ -45,6 +45,8 @@ export class AST {
             print.interpretar(this.contextoGlobal,this.consola)
         }
    });
+
+   console.table(this.contextoGlobal.obtenerTabla());
    
     }
     public getConsola(){

@@ -56,6 +56,34 @@
                 return null;
         }
     }
+
+    var tablaErrores = [];
+
+// Función para reportar errores
+function reportarError(tipo, mensaje, linea, columna) {
+    // Crear un objeto de error con la información relevante
+    var error = {
+        tipo: tipo,
+        mensaje: mensaje,
+        linea: linea,
+        columna: columna
+    };
+
+    // Agregar el error a la tabla de errores
+    tablaErrores.push(error);
+}
+
+function imprimirTablaErrores() {
+    // Iterar sobre cada error en la tabla de errores
+    for (let error of tablaErrores) {
+        // Imprimir la información del error
+        console.log(`Tipo de error: ${error.tipo}`);
+        console.log(`Mensaje de error: ${error.mensaje}`);
+        console.log(`Línea: ${error.linea}`);
+        console.log(`Columna: ${error.columna}`);
+        console.log('-------------------------');
+    }
+}
 %}
 
 %lex // Inicia parte léxica
@@ -167,7 +195,10 @@
 \'[a-zA-Z0-9]\'		    { yytext = yytext.substr(1,yyleng-2); return 'CARACTER'; } 
 <<EOF>>                 return 'EOF';
 
-.					   {    console.log(yylloc.first_line, yylloc.first_column,'Lexico',yytext);    }
+.   {
+  console.log(yylloc.first_line, yylloc.first_column, 'Lexico', yytext);
+  reportarError('Lexico', `${yytext} no pertenece al lenguaje`, yylloc.first_line, yylloc.first_column);
+}
 
 // Finaliza parte de Léxica
 /lex
@@ -213,6 +244,12 @@ instruccion: fn_print PYC               { $$ = $1;}
             | llamada_funcion PYC       { $$ = $1;}
             | execute PYC               { $$ = $1;}
             | instr_return              { $$ = $1;}
+            | error PYC {
+        // Recuperación de errores: salta al siguiente punto y coma
+        console.log('Error sintactico: recuperandose despues del siguiente punto y coma');
+        reportarError('Sintactico', 'Recuperandose despues del siguiente punto y coma', @1.first_line, @1.first_column);
+        imprimirTablaErrores();
+        }
 ;
 
 // Para sitetisar un dato, se utiliza $$
@@ -243,6 +280,11 @@ expresion: RES expresion %prec UMINUS   { $$ = new Aritmetica(new Primitivo(0,0,
         | ID PUNTO LENGTH PARIZQ PARDER { $$ = new Length($1, @1.first_line, @1.first_column);}
         | TYPEOF PARIZQ expresion PARDER { $$ = new Typeof($3, @1.first_line, @1.first_column);}
         | STD DPS DPS TOSTRING PARIZQ expresion PARDER { $$ = new ToString($6, @1.first_line, @1.first_column);}
+        | error PYC {
+                   console.log('Error sintactico: recuperandose despues del siguiente punto y coma');
+                   reportarError('Sintactico', 'Recuperandose despues del siguiente punto y coma', @1.first_line, @1.first_column);
+                   imprimirTablaErrores();      
+                }
 ; 
 
 declaracion: tipos lista_ids ASIGNACION expresion  { $$ = new Declaracion($1, $2, $4, @2.first_line, @2.first_column)}

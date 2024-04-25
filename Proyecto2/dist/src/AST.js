@@ -40,6 +40,7 @@ class AST {
                 print.interpretar(this.contextoGlobal, this.consola);
             }
         });
+        console.table(this.contextoGlobal.obtenerTabla());
     }
     getConsola() {
         console.log(this.consola);

@@ -1,0 +1,135 @@
+<ini> ::= <instrucciones> EOF
+
+<instrucciones> ::= <instrucciones> <instruccion>
+                  | <instruccion>
+
+<instruccion> ::= <fn_print> PYC
+                | <declaracion> PYC
+                | <fn_if>
+                | <fn_switch>
+                | <incre_o_decre> PYC
+                | <ciclo_while>
+                | <inst_break> PYC
+                | <ciclo_do_while>
+                | <ciclo_for>
+                | <inst_break>
+                | CONTINUE PYC
+                | <fn_funcion>
+                | <llamada_funcion> PYC
+                | <execute> PYC
+                | <instr_return>
+
+<expresion> ::= RES <expresion> %prec UMINUS
+              | <expresion> MAS <expresion>
+              | <expresion> RES <expresion>
+              | <expresion> MUL <expresion>
+              | <expresion> DIV <expresion>
+              | <expresion> MOD <expresion>
+              | POW PARIZQ <expresion> COMA <expresion> PARDER
+              | <relacionales>
+              | <logicos>
+              | NUMBER
+              | DOUBLE
+              | TRUE
+              | FALSE
+              | CADENA
+              | PARIZQ <expresion> PARDER
+              | CARACTER
+              | ID
+              | <casteos>
+              | TOLOWER PARIZQ <expresion> PARDER
+              | TOUPPER PARIZQ <expresion> PARDER
+              | ROUND PARIZQ <expresion> PARDER
+              | ID CIZQ <lista_expresiones> CDER
+              | ID CIZQ <lista_expresiones> CDER CIZQ <lista_expresiones> CDER
+              | <llamada_funcion>
+              | ID PUNTO LENGTH PARIZQ PARDER
+              | TYPEOF PARIZQ <expresion> PARDER
+              | STD DPS DPS TOSTRING PARIZQ <expresion> PARDER
+
+<declaracion> ::= <tipos> <lista_ids> ASIGNACION <expresion>
+                | <tipos> <lista_ids>
+                | <tipos> ID CIZQ CDER ASIGNACION NUEVO <tipos> CIZQ <lista_expresiones> CDER
+                | <tipos> ID CIZQ CDER CIZQ CDER ASIGNACION NUEVO <tipos> CIZQ <lista_expresiones> CDER CIZQ <expresion> CDER
+                | <tipos> ID CIZQ CDER ASIGNACION CIZQ <lista_expresiones> CDER
+                | <tipos> ID CIZQ CDER CIZQ CDER ASIGNACION CIZQ CIZQ <lista_expresiones> CDER COMA CIZQ <lista_expresiones> CDER CDER
+
+<lista_ids> ::= <lista_ids> COMA ID
+              | ID
+
+<asignacion> ::= ID ASIGNACION <expresion>
+               | ID CIZQ <expresion> CDER ASIGNACION <expresion>
+
+<ciclo_while> ::= WHILE PARIZQ <expresion> PARDER <bloque>
+
+<ciclo_do_while> ::= DO <bloque> WHILE PARIZQ <expresion> PARDER PYC
+
+<decla_o_asigna> ::= <declaracion>
+                    | <asignacion>
+
+<incre_o_decre> ::= <asignacion>
+                   | ID MAS MAS
+                   | ID RES RES
+
+<ciclo_for> ::= FOR PARIZQ <decla_o_asigna> PYC <relacionales> PYC <incre_o_decre> PARDER <bloque>
+
+<inst_break> ::= BREAK PYC
+
+<tipos> ::= TIPO_INT
+          | TIPO_DOUBLE
+          | BOOL
+          | CHAR
+          | STD DPS DPS STRING
+          | TVOID
+
+<relacionales> ::= <expresion> IGUAL <expresion>
+                  | <expresion> DISTINTO <expresion>
+                  | <expresion> MENOR <expresion>
+                  | <expresion> MENORIGUAL <expresion>
+                  | <expresion> MAYOR <expresion>
+                  | <expresion> MAYORIGUAL <expresion>
+
+<logicos> ::= <expresion> AND <expresion>
+             | <expresion> OR <expresion>
+             | NOT <expresion>
+
+<fn_print> ::= COUT CPR <expresion>
+              | COUT CPR <expresion> CPR ENDL
+
+<bloque> ::= LLAVEIZQ <instrucciones> LLAVEDER
+            | LLAVEIZQ LLAVEDER
+
+<fn_if> ::= IF PARIZQ <expresion> PARDER <bloque>
+           | IF PARIZQ <expresion> PARDER <bloque> ELSE <bloque>
+           | IF PARIZQ <expresion> PARDER <bloque> ELSE <fn_if>
+
+<fn_switch> ::= SWITCH PARIZQ <expresion> PARDER LLAVEIZQ <cases> LLAVEDER
+                | SWITCH PARIZQ <expresion> PARDER LLAVEIZQ <cases> <defaults> LLAVEDER
+                | SWITCH PARIZQ <expresion> PARDER LLAVEIZQ <defaults> LLAVEDER
+
+<cases> ::= <cases> CASE <expresion> DPS <instrucciones> <inst_break>
+            | CASE <expresion> DPS <instrucciones> <inst_break>
+
+<defaults> ::= DEFAULT DPS <instrucciones> <inst_break>
+
+<casteos> ::= PARIZQ <tipos> PARDER <expresion> %prec 'PARDER'
+
+<fn_funcion> ::= <tipos> ID PARIZQ PARDER <bloque>
+                 | <tipos> ID PARIZQ <lista_parametros> PARDER <bloque>
+
+<lista_parametros> ::= <lista_parametros> COMA <parametro>
+                      | <parametro>
+
+<parametro> ::= <tipos> ID
+               | <tipos> ID CIZQ CDER
+
+<llamada_funcion> ::= ID PARIZQ PARDER
+                      | ID PARIZQ <lista_expresiones> PARDER
+
+<lista_expresiones> ::= <lista_expresiones> COMA <expresion>
+                        | <expresion>
+
+<execute> ::= EXEC <llamada_funcion>
+
+<instr_return> ::= RETURN <expresion> PYC
+                   | RETURN PYC

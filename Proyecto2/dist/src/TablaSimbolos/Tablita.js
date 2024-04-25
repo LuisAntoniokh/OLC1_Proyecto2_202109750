@@ -49,5 +49,18 @@ class Contexto {
         }
         return contexto;
     }
+    obtenerTabla() {
+        let tabla = [];
+        this.tabla.forEach((valor, clave) => {
+            tabla.push({
+                id: clave,
+                tipo: typeof valor.obtenerValor,
+                valor: valor.valor,
+                fila: valor.fila,
+                columna: valor.columna,
+            });
+        });
+        return tabla;
+    }
 }
 exports.Contexto = Contexto;

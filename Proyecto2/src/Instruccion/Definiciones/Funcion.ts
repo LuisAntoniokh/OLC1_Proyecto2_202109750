@@ -9,6 +9,7 @@ export class Funcion extends Instruccion{
     private id:string
     private parametros:any[]
     private bloque:Bloque
+    contexto: any;
     constructor(tipo:TipoDato,id:string,parametros:any[],bloque:Bloque ,linea:number,columna:number){
         super(linea,columna)
         this.tipo = tipo

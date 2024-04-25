@@ -2,13 +2,13 @@
 Comentarios.
 Ternario.
 Casteos.
+Vectores (2D).
+c_str.
 
 // Ni idea.
 Secuencias de escape(?)
 
 // Dios plan que va a salir:
-Vectores (2D).
-c_str.
 Reportes y manuales.
 
 
